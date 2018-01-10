@@ -12,9 +12,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
 // fontFamily support
@@ -72,21 +70,21 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
 
     // technically, width should never be negative, but there is currently a bug in
     final boolean unconstrainedWidth = width <= 0;
-    final boolean includeFontPadding = false;
+    final boolean includeFontPadding = true;
     final float spacingMultiplier = 1;
     final float spacingAddition = 0;
     final int textBreakStrategy =
       (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) ? 0 : Layout.BREAK_STRATEGY_HIGH_QUALITY;
 
-    int hintWidth;
+    int hintWidth = 0;
 
     try {
       BoringLayout.Metrics boring = BoringLayout.isBoring(text, textPaint);
       float desiredWidth = boring == null ?
-          Layout.getDesiredWidth(text, textPaint) : -1;
+          Layout.getDesiredWidth(text, textPaint) : Float.NaN;
 
       if (boring == null &&
-        (unconstrainedWidth || (desiredWidth > -1 && desiredWidth <= width))) {
+        (unconstrainedWidth || (!Float.isNaN(desiredWidth) && desiredWidth <= width))) {
         // Is used when the width is not known and the text is not boring, ie. if it contains
         // unicode characters.
         hintWidth = (int) Math.ceil(desiredWidth);
