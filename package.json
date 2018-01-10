@@ -1,6 +1,6 @@
 {
   "name": "react-native-text-size",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Measure text height and width without laying it out.",
   "main": "index.js",
   "types": "./index.d.ts",
@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/amarcruz/react-native-text-size#readme",
   "author": "aMarCruz",
-  "license": "BSD 2-clause License",
+  "license": "MIT",
   "peerDependencies": {
-    "react-native": "^0.50.0"
+    "react-native": ">=0.50.0"
   }
 }

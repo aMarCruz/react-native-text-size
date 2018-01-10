@@ -109,7 +109,7 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
         hintWidth = (int) width;
       }
 
-      if (layout = null) {
+      if (layout == null) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
           layout = new StaticLayout(
             text,

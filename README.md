@@ -5,15 +5,15 @@ Measure text width and height without laying it out.
 [![npm Version][npm-image]][npm-url]
 [![License][license-image]][license-url]
 
-## Installation
+**NOTE:** At this time, iOS support is incomplete.
 
-### Automatic installation
+## Automatic installation
 
 `$ yarn add react-native-text-size`
 
 `$ react-native link react-native-text-size`
 
-### Manual installation
+## Manual installation
 
 #### iOS
 
