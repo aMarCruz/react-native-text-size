@@ -1,0 +1,30 @@
+{
+  "name": "react-native-text-size",
+  "version": "1.0.0-alpha.3",
+  "description": "Measure text height and width without laying it out.",
+  "main": "index.js",
+  "types": "./index.d.ts",
+  "keywords": [
+    "react-native",
+    "measure",
+    "text",
+    "height",
+    "width",
+    "precompute",
+    "block",
+    "multiline"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amarcruz/react-native-text-size.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amarcruz/react-native-text-size/issues"
+  },
+  "homepage": "https://github.com/amarcruz/react-native-text-size#readme",
+  "author": "aMarCruz",
+  "license": "BSD 2-clause License",
+  "peerDependencies": {
+    "react-native": "^0.50.0"
+  }
+}
