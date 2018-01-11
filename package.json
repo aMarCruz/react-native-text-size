@@ -1,6 +1,6 @@
 {
   "name": "react-native-text-size",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "Measure text height and width without laying it out.",
   "main": "index.js",
   "types": "./index.d.ts",

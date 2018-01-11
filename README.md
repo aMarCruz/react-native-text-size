@@ -5,7 +5,7 @@ Measure text width and height without laying it out.
 [![npm Version][npm-image]][npm-url]
 [![License][license-image]][license-url]
 
-**NOTE:** At this time, iOS support is incomplete.
+**WARNING:** At this time, iOS support is incomplete.
 
 ## Automatic installation
 
@@ -49,7 +49,7 @@ Measure text width and height without laying it out.
   width: number,
   height: number,
   lineCount: number,
-  lastLineMax: number
+  lastLineWidth: number  // width of the last line
 }
 ```
 

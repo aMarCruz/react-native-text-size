@@ -5,7 +5,6 @@ import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -51,22 +50,34 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
     TextPaint textPaint = sTextPaintInstance;
     @Nullable Layout layout = null;
 
-    // Optional width?
+    final boolean allowFontScaling = true;
+    final int style = 0;
+
+    // width (optional)
+
     int width = 0;
     if (options.hasKey("width")) {
-      width = Math.round((float) options.getDouble("width"));
+      width = (int) options.getDouble("width");
     }
     String text = options.getString("text");
+
+    // font size
 
     float fontSize = (float) options.getDouble("fontSize");
     textPaint.setTextSize(fontSize);
 
-    String fontFamily = "system";
+    // font family
+
+    @Nullable String fontFamily = null;
     if (options.hasKey("fontFamily")) {
       fontFamily = options.getString("fontFamily");
     }
-    Typeface typeface = getTypeface(fontFamily, 0);
-    textPaint.setTypeface(typeface);
+    if (fontFamily != null && fontFamily != "") {
+      Typeface typeface = getTypeface(fontFamily, style);
+      textPaint.setTypeface(typeface);
+    } else {
+      textPaint.setTypeface(Typeface.defaultFromStyle(style));
+    }
 
     // technically, width should never be negative, but there is currently a bug in
     final boolean unconstrainedWidth = width <= 0;
@@ -135,7 +146,8 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
       result.putInt("width", layout.getWidth());
       result.putInt("height", layout.getHeight());
       result.putInt("lineCount", lineCount);
-      result.putDouble("lastLineMax", (double) layout.getLineMax(lineCount - 1));
+      result.putDouble("lastLineWidth", (double) layout.getLineMax(lineCount - 1));
+
       promise.resolve(result);
 
     } catch (Exception e) {
