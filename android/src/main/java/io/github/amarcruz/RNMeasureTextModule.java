@@ -79,9 +79,13 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
       textPaint.setTypeface(Typeface.defaultFromStyle(style));
     }
 
+    boolean includeFontPadding = true;
+    if (options.hasKey("includeFontPadding")) {
+      includeFontPadding = options.getBoolean("includeFontPadding");
+    }
+
     // technically, width should never be negative, but there is currently a bug in
     final boolean unconstrainedWidth = width <= 0;
-    final boolean includeFontPadding = true;
     final float spacingMultiplier = 1;
     final float spacingAddition = 0;
     final int textBreakStrategy =

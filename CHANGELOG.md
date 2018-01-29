@@ -1,5 +1,9 @@
 # Changes
 
+### v1.0.0-alpha.8
+- Suppport for `includeFontPadding`
+- Using gradle 2.2.3
+
 ### v1.0.0-alpha.7
 - Uses scaled fontSize (Android, automatic).
 

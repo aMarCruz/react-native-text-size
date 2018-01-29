@@ -5,6 +5,7 @@ declare module "react-native-text-size" {
     fontSize: number;
     fontFamily?: string;
     width?: number;
+    includeFontPadding?: boolean;
   }
 
   export type TextSizeResult = {
