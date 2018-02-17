@@ -1,4 +1,4 @@
-package io.github.amarcruz;
+package io.amarcruz.rnmeasuretext;
 
 import android.os.Build;
 import android.text.BoringLayout;

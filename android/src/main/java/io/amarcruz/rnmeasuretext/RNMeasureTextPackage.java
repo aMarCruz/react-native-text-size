@@ -1,4 +1,4 @@
-package io.github.amarcruz;
+package io.amarcruz.rnmeasuretext;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;
