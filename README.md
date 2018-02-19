@@ -9,9 +9,10 @@ Measure text width and height without laying it out.
 
 ## Automatic installation
 
-`$ yarn add react-native-text-size`
-
-`$ react-native link react-native-text-size`
+```bash
+$ yarn add react-native-text-size
+$ react-native link react-native-text-size
+```
 
 ## Manual installation
 
@@ -25,15 +26,15 @@ Measure text width and height without laying it out.
 #### Android
 
 1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-  - Add `import io.github.amarcruz.RNMeasureTextPackage;` to the imports at the top of the file
+  - Add `import io.amarcruz.rnmeasuretext.RNMeasureTextPackage;` to the imports at the top of the file
   - Add `new RNMeasureTextPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
-  	```
+  	```groovy
   	include ':react-native-text-size'
   	project(':react-native-text-size').projectDir = new File(rootProject.projectDir, 	'../node_modules/react-native-text-size/android')
   	```
 3. Insert the following lines inside the dependencies block in `android/app/build.gradle`:
-  	```
+  	```groovy
       compile project(':react-native-text-size')
   	```
 
@@ -102,4 +103,4 @@ Copyright (c) 2017 Alberto Martínez (https://github.com/aMarCruz)
 [npm-image]:      https://img.shields.io/npm/v/react-native-text-size.svg
 [npm-url]:        https://www.npmjs.com/package/react-native-text-size
 [license-image]:  https://img.shields.io/npm/l/express.svg
-[license-url]:    https://github.com/aMarCruz/jscc-brunch/blob/master/LICENSE
+[license-url]:    https://github.com/aMarCruz/react-native-text-size/blob/master/LICENSE
