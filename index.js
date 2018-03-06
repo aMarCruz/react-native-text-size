@@ -7,7 +7,7 @@ const RNMeasureText = NativeModules.RNMeasureText;
  *
  * @param {object} params - Info
  */
-export function measure (params) {
+function measure (params) {
 
   const fontSize = params && params.fontSize
 
@@ -26,4 +26,8 @@ export function measure (params) {
   }
 
   return RNMeasureText.measure(params);
+}
+
+export default {
+  measure: measure,
 }
