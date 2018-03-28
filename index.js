@@ -2,6 +2,8 @@ import { Dimensions, NativeModules } from 'react-native';
 
 const RNMeasureText = NativeModules.RNMeasureText;
 
+const windowDims = Dimensions.get('window')
+
 /**
  * Get width, height, lineCount, and lastLineWidth values for text.
  *
@@ -15,7 +17,7 @@ function measure (params) {
     return Promise.reject(new Error('missing required \'fontSize\' property'));
   }
 
-  const fontScale = Dimensions.get('window').fontScale || 1;
+  const fontScale = windowDims.fontScale || 1;
 
   if (fontScale !== 1) {
     params = Object.assign(

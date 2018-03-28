@@ -22,11 +22,11 @@ import javax.annotation.Nullable;
 
 public class RNMeasureTextModule extends ReactContextBaseJavaModule {
 
-  public static void setAssetManager(AssetManager assetManager) {
+  static void setAssetManager(AssetManager assetManager) {
     sAssetManager = assetManager;
   }
 
-  public RNMeasureTextModule(ReactApplicationContext reactContext) {
+  RNMeasureTextModule(ReactApplicationContext reactContext) {
     super(reactContext);
     setAssetManager(reactContext.getAssets());
   }
@@ -50,7 +50,7 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
     TextPaint textPaint = sTextPaintInstance;
     @Nullable Layout layout = null;
 
-    final boolean allowFontScaling = true;
+    //final boolean allowFontScaling = true;
     final int style = 0;
 
     // width (optional)
@@ -72,7 +72,7 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
     if (options.hasKey("fontFamily")) {
       fontFamily = options.getString("fontFamily");
     }
-    if (fontFamily != null && fontFamily != "") {
+    if (fontFamily != null && !fontFamily.isEmpty()) {
       Typeface typeface = getTypeface(fontFamily, style);
       textPaint.setTypeface(typeface);
     } else {
@@ -88,8 +88,6 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
     final boolean unconstrainedWidth = width <= 0;
     final float spacingMultiplier = 1;
     final float spacingAddition = 0;
-    final int textBreakStrategy =
-      (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) ? 0 : Layout.BREAK_STRATEGY_HIGH_QUALITY;
 
     int hintWidth = 0;
 
@@ -134,13 +132,16 @@ public class RNMeasureTextModule extends ReactContextBaseJavaModule {
             includeFontPadding
           );
         } else {
-          layout = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
+          StaticLayout.Builder builder = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
             .setAlignment(Layout.Alignment.ALIGN_NORMAL)
             .setLineSpacing(spacingAddition, spacingMultiplier)
             .setIncludePad(includeFontPadding)
-            .setBreakStrategy(textBreakStrategy)
-            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
-            .build();
+            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL);
+
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            builder.setBreakStrategy(Layout.BREAK_STRATEGY_HIGH_QUALITY);
+          }
+          layout = builder.build();
         }
       }
 

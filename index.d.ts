@@ -13,10 +13,10 @@ declare module "react-native-text-size" {
     height: number,
     lineCount: number,
     lastLineWidth: number,
-  }
+  };
 
   interface TextSizeStatic {
-    measure: (params: TextSizeParams) => Promise<TextSizeResult>;
+    measure(params: TextSizeParams): Promise<TextSizeResult>;
   }
 
   const TextSize: TextSizeStatic;
