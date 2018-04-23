@@ -1,5 +1,8 @@
 # Changes
 
+### v1.0.0-beta.4
+- Compatible with globals for flexible configuration
+
 ### v1.0.0-alpha.8
 - Suppport for `includeFontPadding`
 - Using gradle 2.2.3
