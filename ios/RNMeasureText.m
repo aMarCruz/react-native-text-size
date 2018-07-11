@@ -25,8 +25,8 @@ RCT_EXPORT_METHOD(measure:(NSDictionary *)options
       reject(@"invalid_width", @"missing required width property", nil);
       return;
     }
-    if ([options objectForKey:@"texts"] == nil) {
-      reject(@"invalid_texts", @"missing required texts property", nil);
+    if ([options objectForKey:@"text"] == nil) {
+      reject(@"invalid_text", @"missing required text property", nil);
       return;
     }
     if ([options objectForKey:@"fontSize"] == nil) {
@@ -35,29 +35,41 @@ RCT_EXPORT_METHOD(measure:(NSDictionary *)options
     }
 
     float width = [RCTConvert float:options[@"width"]];
-    NSArray *texts = [RCTConvert NSArray:options[@"texts"]];
+    NSString *text = [RCTConvert NSString:options[@"text"]];
     CGFloat fontSize = [RCTConvert CGFloat:options[@"fontSize"]];
 
-    NSMutableArray* results = [[NSMutableArray alloc] init];
+    NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+    
     UIFont *font = [UIFont systemFontOfSize: fontSize];
-
-    for (NSString* text in texts) {
-        NSTextStorage *textStorage = [[NSTextStorage alloc] initWithString:text];
+    
+    CGFloat firstHeight = 0;
+    
+    for (NSString *s in [NSArray arrayWithObjects:@" ", text, nil]) {
+        NSTextStorage *textStorage = [[NSTextStorage alloc] initWithString:s];
         NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize: CGSizeMake(width, FLT_MAX)];
         NSLayoutManager *layoutManager = [[NSLayoutManager alloc] init];
-
+        
         [layoutManager addTextContainer:textContainer];
         [textStorage addLayoutManager:layoutManager];
-
+        
         [textStorage addAttribute:NSFontAttributeName value:font
                             range:NSMakeRange(0, [textStorage length])];
         [textContainer setLineFragmentPadding:0.0];
         (void) [layoutManager glyphRangeForTextContainer:textContainer];
         CGRect resultRect = [layoutManager usedRectForTextContainer:textContainer];
-
-        [results addObject:[NSNumber numberWithFloat:resultRect.size.height]];
+        if (firstHeight == 0) {
+            firstHeight = resultRect.size.height;
+        } else {
+            CGFloat height = resultRect.size.height;
+            int lines = height / firstHeight;
+            result[@"width"] = @(resultRect.size.width);
+            result[@"height"] = @(height);
+            result[@"lineCount"] = @(lines);
+            result[@"lastLineWidth"] = @(0);
+        }
     }
-    resolve(results);
+    
+    resolve(result);
 }
 
 @end
