@@ -72,7 +72,7 @@ fontWeight | string | 'normal' | On android, numeric ranges has no granularity a
 fontSize   | number | 14       | The default value is that used by RN and is provided in the `TextSize.FontSize.default` constant.
 fontStyle  | string | 'normal' | One of "normal" or "italic".
 allowFontScaling | boolean | true | Apply user accessibility settings (i.e. use SP units).
-letterSpacing    | number  | 0    | Additional spacing between letters.
+letterSpacing    | number  | 0    | Additional spacing between letters (ignored in Android if SDK < 21 or RN < 0.55).
 includeFontPadding | boolean | true | Android only. Include additional top and bottom padding.
 textBreakStrategy  | string  | 'highQuality' | Android API 23+ only: 'simple', 'balanced', or 'highQuality'
 fontVariant        | array   | (none)        | iOS only.
@@ -231,6 +231,8 @@ caption    | sans-serif        | 12   | 0.4
 overline   | sans-serif        | 10   | 1.5
 
 The font used, in non-rooted devices are sans-serif: Roboto, sans-serif-light: Roboto-Light, sans-serif-medium: Roboto-Medium.
+
+In Android, letterSpacing is omitted when running in ReactNative v0.54 or lower.
 
 _Note: The Material Design guide determines that both, 'button' and 'overline' text must be uppercase, but `fontVariant` is not supported in RN for Android, so that property is excluded._
 

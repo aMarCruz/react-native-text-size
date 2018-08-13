@@ -10,12 +10,25 @@ import android.util.Log;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.modules.systeminfo.ReactNativeVersion;
+
+import java.util.Map;
 
 final class RNTextSizeConf {
     private static final float DEF_FONTSIZE = 14.0f;
+    private static final int rnVersion;
     private static final ReadableMap emptySpecs;
+
     static {
         emptySpecs = Arguments.createMap();
+
+        int version = 0;
+        try {
+            Map<String, Object> rnv = ReactNativeVersion.VERSION;
+            version = ((int) rnv.get("major") << 16) | (int) rnv.get("minor");
+        } catch (Exception ignore) {
+        }
+        rnVersion = version;
     }
 
     @NonNull
@@ -62,8 +75,10 @@ final class RNTextSizeConf {
         fontFamily = getString("fontFamily");
         fontSize = getFontSizeOrDefault();
         fontStyle = _fontStyle;
-        letterSpacing = getFloatOrNaN("letterSpacing");
         includeFontPadding = forText && getBooleanOrTrue("includeFontPadding");
+
+        // letterSpacing is supported in RN 0.55+
+        letterSpacing = supportLetterSpacing() ? getFloatOrNaN("letterSpacing") : Float.NaN;
     }
 
     float getFloatOrNaN(@NonNull final String name) {
@@ -74,6 +89,11 @@ final class RNTextSizeConf {
     String getString(@NonNull final String name) {
         return mOpts.hasKey(name)
                 ? mOpts.getString(name) : null;
+    }
+
+    // letterSpacing is supported in RN 0.55+
+    static boolean supportLetterSpacing() {
+        return rnVersion >= 55;
     }
 
     @NonNull

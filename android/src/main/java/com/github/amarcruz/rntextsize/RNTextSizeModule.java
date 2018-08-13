@@ -407,7 +407,10 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
 
         map.putString("fontFamily", suffix != null ? (roboto + suffix) : roboto);
         map.putInt("fontSize", fontSize);
-        map.putDouble("letterSpacing", letterSpacing);
+
+        if (RNTextSizeConf.supportLetterSpacing()) {
+            map.putDouble("letterSpacing", letterSpacing);
+        }
 
         return map;
     }
