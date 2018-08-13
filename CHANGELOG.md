@@ -1,5 +1,9 @@
 # Changes
 
+### v1.0.0-beta.5
+- Preliminary implementation for iOS (thanks to @xuhom)
+- The license is changed to BSD 2-Clause from [react-native-measure-text](https://github.com/airamrguez/react-native-measure-text), on which this library is based.
+
 ### v1.0.0-beta.4
 - Compatible with globals for flexible configuration
 

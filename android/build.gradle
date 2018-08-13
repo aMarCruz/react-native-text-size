@@ -1,18 +1,28 @@
-def DEF_BUILD_TOOLS_VERSION = '27.0.3'
+import groovy.json.JsonSlurper
+
+def getPackageVersion() {
+    def slurper = new JsonSlurper()
+    return slurper.parse(file('../package.json'), 'utf-8').version
+}
+
+def DEF_BUILD_TOOLS_VERSION = '26.0.3'
 def DEF_COMPILE_SDK_VERSION = 26
-def DEF_MIN_SDK_VERSION     = 16
 def DEF_TARGET_SDK_VERSION  = 26
+def DEF_MIN_SDK_VERSION     = 16
 
 def _buildToolsVersion  = rootProject.hasProperty('buildToolsVersion') ? rootProject.buildToolsVersion : DEF_BUILD_TOOLS_VERSION
 def _compileSdkVersion  = rootProject.hasProperty('compileSdkVersion') ? rootProject.compileSdkVersion : DEF_COMPILE_SDK_VERSION
-def _minSdkVersion      = rootProject.hasProperty('minSdkVersion')     ? rootProject.minSdkVersion : DEF_MIN_SDK_VERSION
 def _targetSdkVersion   = rootProject.hasProperty('targetSdkVersion')  ? rootProject.targetSdkVersion  : DEF_TARGET_SDK_VERSION
+def _minSdkVersion      = rootProject.hasProperty('minSdkVersion')     ? rootProject.minSdkVersion     : DEF_MIN_SDK_VERSION
 
 buildscript {
     repositories {
+        maven {
+            url 'https://maven.google.com/'
+            name 'google'
+        }
         jcenter()
     }
-
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
     }
@@ -27,16 +37,30 @@ android {
     defaultConfig {
         minSdkVersion _minSdkVersion
         targetSdkVersion _targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName getPackageVersion()
     }
     lintOptions {
         abortOnError false
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 repositories {
-    mavenCentral()
+    mavenLocal()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+        name 'React Native (local)'
+    }
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
+    jcenter()
 }
 
 dependencies {

@@ -1,0 +1,95 @@
+/* @flow */
+
+export type TSFontWeight = 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
+export type TSFontStyle = 'normal' | 'italic'
+export type TSFontVariant = 'small-caps' | 'oldstyle-nums' | 'lining-nums' | 'tabular-nums' | 'proportional-nums'
+export type TSTextBreakStrategy = 'simple' | 'highQuality' | 'balanced'
+
+export type TSFontSize = {|
+  +default: number,
+  +button: number,
+  +label: number,
+  +smallSystem: number,
+  +system: number,
+|}
+
+// export type TSMDStyleSpec =
+// | 'h1'
+// | 'h2'
+// | 'h3'
+// | 'h4'
+// | 'h5'
+
+export type TSTextStyle =
+| 'body'
+| 'callout'
+| 'caption1'
+| 'caption2'
+| 'footnote'
+| 'headline'
+| 'subheadline'
+| 'title1'
+| 'title2'
+| 'title3'
+
+export type TSFontInfo = {
+  fontFamily: string | null,
+  fontName: string | null,
+  fontWeight: TSFontWeight,
+  fontSize: number,
+  fontStyle: TSFontStyle,
+  fontVariant?: TSFontVariant | null,
+  ascender: number,
+  descender: number,
+  capHeight?: number,
+  xHeight?: number,
+  top?: number,
+  bottom?: number,
+  leading: number,
+  lineHeight: number,
+  _hash: number,
+}
+
+export type TSFontSpecs = {
+  fontFamily?: string | void,
+  fontSize?: number,
+  fontStyle?: TSFontStyle,
+  fontWeight?: TSFontWeight,
+  /** @platform ios */
+  fontVariant?: Array<TFontVariant>;
+  /** iOS all, Android SDK 21+ */
+  letterSpacing?: number;
+  /** @platform android */
+  includeFontPadding?: boolean;
+  /** @platform android (SDK 23+) */
+  textBreakStrategy?: TTextBreakStrategy;
+}
+
+export type TSMeasureParams = TSFontSpecs & {
+  /** The required text to measure. */
+  text: string,
+  /** Maximum width of the area to display the text. @default MAX_INT */
+  width?: number,
+  /** @default true */
+  allowFontScaling?: boolean;
+}
+
+export interface TSMeasureResult {
+  width: number;
+  height: number;
+  lastLineWidth: number;
+  lineCount: number;
+}
+
+declare interface TextSizeStatic {
+  +FontSize: TSFontSize;
+
+  measure(params: TSMeasureParams): Promise<TSMeasureResult>;
+  specsForTextStyles(): Promise<{ [string]: TSFontSpecs }>;
+  fontFromSpecs(specs: TSFontSpecs): Promise<TSFontInfo>;
+  fontFamilyNames(): Promise<string[]>;
+  fontNamesForFamilyName(fontFamily: string): Promise<string[]>;
+}
+
+declare var TextSize: TextSizeStatic;
+export default TextSize;
