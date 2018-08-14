@@ -15,7 +15,6 @@ import {
   Text,
   TextInput,
   View,
-  //PixelRatio,
 } from 'react-native'
 import TextSize from 'react-native-text-size'
 
@@ -34,6 +33,9 @@ type State = {
   layout?: { width: number, height: number }
 }
 
+const IOS = Platform.OS === 'ios' && Platform.Version || undefined
+const ANDROID = Platform.OS === 'android' && Platform.Version || undefined
+
 const winDims = Dimensions.get('window')
 const TEXT_TOP = 0
 const TEXT_LEFT = 16
@@ -47,13 +49,11 @@ const TEST_FONT: TSFontSpecs = {
   fontVariant: undefined,
   includeFontPadding: true,
   letterSpacing: undefined,
+  textBreakStrategy: undefined,
 }
 const TEXT_STR = 'This is a first string\n' +
 'The second string is slightly bigger ƒƒ \n' +
 'Bacon ⌛ ⌨ ☄ 🤘 ipsum dolor 12345 amet 67890 capicola filet mignon flank venison ball tip pancetta cupim tenderloin bacon beef shank.'
-
-const IOS = Platform.OS === 'ios' && Platform.Version || undefined
-const ANDROID = Platform.OS === 'android' && Platform.Version || undefined
 
 const reactNativeVersion = (): { major: number, minor: number, patch: number } => {
   try {
@@ -80,8 +80,10 @@ export default class MeasureApp extends React.Component<Props, State> {
       allowFontScaling: true,
     }
 
-    StatusBar.setBackgroundColor('#002984')
-    StatusBar.setTranslucent(true)
+    if (ANDROID) {
+      StatusBar.setBackgroundColor('#002984')
+      StatusBar.setTranslucent(true)
+    }
 
     TextSize.fontFromSpecs({
       ...TEST_FONT,
@@ -166,14 +168,22 @@ export default class MeasureApp extends React.Component<Props, State> {
   setTextBreakStrategy = (textBreakStrategy: TSTextBreakStrategy) => {
     this.doMeasure({ textBreakStrategy })
   }
-  setAllowFontScaling = (allowFontScaling: boolean) => {
-    this.doMeasure({ allowFontScaling })
-  }
   setIncludeFontPadding = (includeFontPadding: boolean) => {
     this.doMeasure({ includeFontPadding })
   }
   setFontVariant = (variant: TSFontVariant) => {
     this.doMeasure({ fontVariant: variant ? [variant] : undefined })
+  }
+
+  setAllowFontScaling = (allowFontScaling: boolean) => {
+    const { specs, text, width } = this.state
+    const specsParams = {
+      ...specs, text, width, allowFontScaling,
+    }
+    TextSize.measure(specsParams).then((info) => {
+      this.displayResult(info)
+      this.setState({ allowFontScaling })
+    }).catch(console.error)
   }
 
   onLayout = (e: ViewLayoutEvent) => {
@@ -313,8 +323,8 @@ export default class MeasureApp extends React.Component<Props, State> {
             <Text styles={styles.prompt}>allowFontScaling:</Text>
             <Switch
               style={styles.switchBox}
-              value={specs.allowFontScaling}
-              onValueChange={(allowFontScaling) => this.doMeasure({ allowFontScaling })}
+              value={allowFontScaling}
+              onValueChange={this.setAllowFontScaling}
             />
           </View>
 
@@ -341,7 +351,7 @@ export default class MeasureApp extends React.Component<Props, State> {
 
             <Text
               allowFontScaling={allowFontScaling}
-              style={[styles.sample, specs]}
+              style={[styles.sample, (specs: any)]}
               onLayout={this.onLayout}>
               {text}
             </Text>
@@ -385,7 +395,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   statusText: {
-    fontFamily: 'monospace',
+    fontFamily: IOS ? 'Courier' : 'monospace',
     fontSize: 12,
   },
   sample: {
@@ -418,7 +428,7 @@ const styles = StyleSheet.create({
     minWidth: 128,
     textAlign: 'right',
     marginRight: 12,
-    fontFamily: 'monospace',
+    fontFamily: IOS ? 'Courier' : 'monospace',
     fontWeight: 'bold',
   },
   switchBox: {

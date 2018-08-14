@@ -181,8 +181,8 @@ fontStyle  | TFontStyle | 'normal' or 'italic'.
 fontVariant | TFontVariant | iOS only, `undefined` in Android.
 ascender   | number | The _recommended_ distance above the baseline for singled spaced text.
 descender  | number | The _recommended_ distance below the baseline for singled spaced text.
-capHeight  | number | iOS only. Height of uppercase letters.
-xHeight    | number | iOS only. Height of the lowercase 'x'.
+capHeight  | number | iOS only. Height of capital characters.
+xHeight    | number | iOS only. Height of lowercase 'x'.
 top        | number | Android only. Maximum distance above the baseline for the tallest glyph in the font.
 bottom     | number | Android only. Maximum distance below the baseline for the lowest glyph in the font.
 leading    | number | The _recommended_ additional space to add between lines of text.

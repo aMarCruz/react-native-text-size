@@ -56,13 +56,13 @@ export type TSFontSpecs = {
   fontStyle?: TSFontStyle,
   fontWeight?: TSFontWeight,
   /** @platform ios */
-  fontVariant?: Array<TFontVariant>;
+  fontVariant?: Array<TSFontVariant>,
   /** iOS all, Android SDK 21+ */
-  letterSpacing?: number;
+  letterSpacing?: number,
   /** @platform android */
-  includeFontPadding?: boolean;
+  includeFontPadding?: boolean,
   /** @platform android (SDK 23+) */
-  textBreakStrategy?: TTextBreakStrategy;
+  textBreakStrategy?: TSTextBreakStrategy,
 }
 
 export type TSMeasureParams = TSFontSpecs & {
@@ -71,7 +71,7 @@ export type TSMeasureParams = TSFontSpecs & {
   /** Maximum width of the area to display the text. @default MAX_INT */
   width?: number,
   /** @default true */
-  allowFontScaling?: boolean;
+  allowFontScaling?: boolean,
 }
 
 export interface TSMeasureResult {

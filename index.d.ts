@@ -34,7 +34,7 @@ declare module "react-native-text-size" {
 
   export type TSFontInfo = {
     fontFamily: string | null,
-    fontName: string | null,
+    fontName?: string | null,
     fontWeight: TSFontWeight,
     fontSize: number,
     fontStyle: TSFontStyle,
@@ -57,7 +57,6 @@ declare module "react-native-text-size" {
     fontWeight?: TSFontWeight;
     /** @platform ios */
     fontVariant?: Array<TSFontVariant>;
-    allowFontScaling?: boolean;
     letterSpacing?: number;
     /** @platform android */
     includeFontPadding?: boolean;
