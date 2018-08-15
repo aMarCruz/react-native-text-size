@@ -32,7 +32,6 @@ module.exports = {
 
   settings: {
     react: {
-      flowVersion: '0.75',  // must match [version] in .flowconfig
     },
   },
 

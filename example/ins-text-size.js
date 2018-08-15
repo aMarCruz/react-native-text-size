@@ -1,4 +1,5 @@
 /* eslint-env node */
+// @ts-nocheck
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
@@ -31,12 +32,10 @@ fs.mkdtemp(path.join(os.tmpdir(), 'ts-'), (err, folder) => {
     process.exit(1)
   }
   const outFile = path.join(folder, Date.now().toString(16) + '.tgz')
-  console.log('out: ' + outFile)
 
   execFile(PACKAGER, `pack ${packPath} -f ${outFile}`, { cwd: packPath })
     .then((info) => {
       console.log(info.stdout)
-      console.log('Now working in ' + path.normalize('.'))
       return execFile(PACKAGER, `add ${outFile} --force --no-lockfile -O`)
     })
     .then((info) => {

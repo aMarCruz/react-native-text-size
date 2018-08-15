@@ -1,4 +1,5 @@
 /* eslint-env node */
+// @ts-nocheck
 module.exports = {
 
   getTransformModulePath () {
