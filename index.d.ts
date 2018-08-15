@@ -74,7 +74,7 @@ declare module "react-native-text-size" {
     textBreakStrategy?: TSTextBreakStrategy;
   }
 
-  export type TSFontTextStyle = {
+  export type TSFontForStyle = {
     fontFamily: string | void,
     fontSize: number,
     fontStyle: TSFontStyle,
@@ -105,7 +105,7 @@ declare module "react-native-text-size" {
     readonly FontSize: TSFontSize;
 
     measure(params: TSMeasureParams): Promise<TSMeasureResult>;
-    specsForTextStyles(): Promise<{ [key: string]: TSFontTextStyle }>;
+    specsForTextStyles(): Promise<{ [key: string]: TSFontForStyle }>;
     fontFromSpecs(specs?: TSFontSpecs): Promise<TSFontInfo>;
     fontFamilyNames(): Promise<string[]>;
   }

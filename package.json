@@ -18,7 +18,8 @@
     "width",
     "precompute",
     "block",
-    "multiline"
+    "multiline",
+    "fonts"
   ],
   "repository": {
     "type": "git",

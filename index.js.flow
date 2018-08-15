@@ -74,7 +74,7 @@ export type TSFontSpecs = {
   textBreakStrategy?: TSTextBreakStrategy,
 }
 
-export type TSFontTextStyle = {
+export type TSFontForStyle = {
   fontFamily: string | void,
   fontSize: number,
   fontStyle: TSFontStyle,
@@ -105,7 +105,7 @@ declare interface TextSizeStatic {
   +FontSize: TSFontSize;
 
   measure(params: TSMeasureParams): Promise<TSMeasureResult>;
-  specsForTextStyles(): Promise<{ [string]: TSFontTextStyle }>;
+  specsForTextStyles(): Promise<{ [string]: TSFontForStyle }>;
   fontFromSpecs(specs: TSFontSpecs): Promise<TSFontInfo>;
   fontFamilyNames(): Promise<string[]>;
 }

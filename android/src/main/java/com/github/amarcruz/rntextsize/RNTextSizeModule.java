@@ -11,7 +11,6 @@ import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -40,10 +39,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     private static final float SIZE_14DP = 14f;
 
     private static final String E_MISSING_TEXT = "E_MISSING_TEXT";
+    private static final String E_MISSING_PARAMETER = "E_MISSING_PARAMETER";
     private static final String E_INVALID_FONT_SPEC = "E_INVALID_FONT_SPEC";
-    private static final String E_INVALID_PARAMETER = "E_INVALID_PARAMETER";
-    private static final String E_INVALID_FONTTYPE = "E_INVALID_FONTTYPE";
-    //private static final String E_INVALID_FONTFAMILY = "E_INVALID_FONTFAMILY";
     private static final String E_UNKNOWN_ERROR = "E_UNKNOWN_ERROR";
 
     // It's important to pass the ANTI_ALIAS_FLAG flag to the constructor rather than setting it
@@ -87,7 +84,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         }
         final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
 
-        @Nullable final String text = conf.getString("text");
+        final String text = conf.getString("text");
         if (text == null) {
             promise.reject(E_MISSING_TEXT, "Missing required text.");
             return;
@@ -109,7 +106,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        @Nullable final Typeface typeface = resetPaintWithFont(textPaint, conf);
+        final Typeface typeface = resetPaintWithFont(textPaint, conf);
         if (typeface == null) {
             promise.reject(E_INVALID_FONT_SPEC, "Invalid font specification.");
             return;
@@ -124,7 +121,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             width = Float.MAX_VALUE;
         }
 
-        @Nullable Layout layout = null;
+        Layout layout = null;
         try {
             final BoringLayout.Metrics boring = BoringLayout.isBoring(text, textPaint);
             int hintWidth = (int) width;
@@ -210,7 +207,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         if (conf == null) {
             return;
         }
-        @Nullable final String text = conf.getString("text");
+        final String text = conf.getString("text");
         if (text == null) {
             promise.reject(E_MISSING_TEXT, "Missing required text.");
             return;
@@ -329,7 +326,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     @Nullable
     private RNTextSizeConf getConf(final ReadableMap specs, final Promise promise, boolean forText) {
         if (specs == null) {
-            promise.reject("E_PARAMETERS", "Missing parameters.");
+            promise.reject(E_MISSING_PARAMETER, "Missing parameter object.");
             return null;
         }
         return new RNTextSizeConf(specs, forText);
@@ -406,6 +403,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         final String roboto = "sans-serif";
 
         map.putString("fontFamily", suffix != null ? (roboto + suffix) : roboto);
+        map.putString("fontStyle", "normal");
+        map.putString("fontWeight", "normal"); // the font determines the weight
         map.putInt("fontSize", fontSize);
 
         if (RNTextSizeConf.supportLetterSpacing()) {

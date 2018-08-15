@@ -92,8 +92,10 @@ In case of error, the promise is rejected with an extended Error object with one
 
 Code | Details
 ---- | -------
-E_PARAMETERS   | `measure` requires an object with the parameters, which was not provided.
-E_MISSING_TEXT | The text to measure was not provided.
+E_MISSING_PARAMETERS | `measure` requires an object with the parameters, which was not provided.
+E_MISSING_TEXT | The text to measure is `null` or was not provided.
+E_INVALID_FONT_SPEC | The font specification is not valid. It is unlikely that this will happen on Android.
+E_UNKNOWN_ERROR | Well... who knows?
 
 #### Example
 
@@ -248,15 +250,22 @@ caption1    | `UIFontTextStyleCaption1`
 caption2    | `UIFontTextStyleCaption2`
 footnote    | `UIFontTextStyleFootnote`
 headline    | `UIFontTextStyleHeadline`
-subheadline | `UIFontTextStyleSubheadline`
+largeTitle  | `UIFontTextStyleLargeTitle`     // iOS 11+
+title1      | `UIFontTextStyleTitle1`
 title1      | `UIFontTextStyleTitle1`
 title2      | `UIFontTextStyleTitle2`
 title3      | `UIFontTextStyleTitle3`
 
-**TSFontInfo**
+**TSFontForStyle**
 
-See [TSFontInfo](#tsfontinfo) in `fontFromSpecs`.
-
+Property    | Type    | Notes
+----------- | ------- |------
+fontFamily  | string  | System font face or family name.
+fontSize    | number  | Unescaled font size in _sp_.
+fontStyle   | TSFontStyle  |
+fontWeight  | TSFontWeight |
+fontVariant | TSFontVariant[] | null | iOS only
+letterSpacing | number | iOS: all, Android: SDK 21+ and RN 0.55+
 
 ### `fontFamilyNames`
 
