@@ -67,4 +67,4 @@ suppress_type=$FlowSucks
 suppress_comment=\\(.\\|\n\\)*\\$FlowSucks\\.*
 
 [version]
-^0.75.0
+^0.61.0

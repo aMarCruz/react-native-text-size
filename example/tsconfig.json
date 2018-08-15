@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "es2015",
+    "lib": ["es2017"],
+    "jsx": "react",
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "newLine": "lf",
+    "charset": "utf8",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+  },
+  "exclude": [
+    "node_modules",
+  ],
+}

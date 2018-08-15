@@ -1,7 +1,4 @@
 {
-  // tell TS do not check this flow files
-  "javascript.validate.enable": false,
-  "typescript.autoImportSuggestions.enabled": false,
+  "typescript.autoImportSuggestions.enabled": true,
   "typescript.disableAutomaticTypeAcquisition": true,
-  "typescript.validate.enable": false
 }

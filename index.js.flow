@@ -13,12 +13,20 @@ export type TSFontSize = {|
   +system: number,
 |}
 
-// export type TSMDStyleSpec =
-// | 'h1'
-// | 'h2'
-// | 'h3'
-// | 'h4'
-// | 'h5'
+export type TSMDStyleSpec =
+| 'h1'
+| 'h2'
+| 'h3'
+| 'h4'
+| 'h5'
+| 'h6'
+| 'subtitle1'
+| 'subtitle2'
+| 'body1'
+| 'body2'
+| 'button'
+| 'caption'
+| 'overline'
 
 export type TSTextStyle =
 | 'body'
@@ -28,6 +36,7 @@ export type TSTextStyle =
 | 'footnote'
 | 'headline'
 | 'subheadline'
+| 'largeTitle'
 | 'title1'
 | 'title2'
 | 'title3'
@@ -57,12 +66,23 @@ export type TSFontSpecs = {
   fontWeight?: TSFontWeight,
   /** @platform ios */
   fontVariant?: Array<TSFontVariant>,
-  /** iOS all, Android SDK 21+ */
+  /** iOS all, Android SDK 21+ with RN 0.55+ */
   letterSpacing?: number,
   /** @platform android */
   includeFontPadding?: boolean,
   /** @platform android (SDK 23+) */
   textBreakStrategy?: TSTextBreakStrategy,
+}
+
+export type TSFontTextStyle = {
+  fontFamily: string | void,
+  fontSize: number,
+  fontStyle: TSFontStyle,
+  fontWeight: TSFontWeight,
+  /** @platform ios */
+  fontVariant?: Array<TSFontVariant> | null,
+  /** iOS all, Android SDK 21+ with RN 0.55+ */
+  letterSpacing?: number,
 }
 
 export type TSMeasureParams = TSFontSpecs & {
@@ -85,10 +105,9 @@ declare interface TextSizeStatic {
   +FontSize: TSFontSize;
 
   measure(params: TSMeasureParams): Promise<TSMeasureResult>;
-  specsForTextStyles(): Promise<{ [string]: TSFontSpecs }>;
+  specsForTextStyles(): Promise<{ [string]: TSFontTextStyle }>;
   fontFromSpecs(specs: TSFontSpecs): Promise<TSFontInfo>;
   fontFamilyNames(): Promise<string[]>;
-  fontNamesForFamilyName(fontFamily: string): Promise<string[]>;
 }
 
 declare var TextSize: TextSizeStatic;

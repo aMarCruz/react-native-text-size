@@ -3,33 +3,39 @@
 import React from 'react'
 import {
   Dimensions,
-  Picker,
   Platform,
   SafeAreaView,
   StatusBar,
   ScrollView,
   StyleSheet,
   Switch,
-  //TabBarIOS,
   ToolbarAndroid,
   Text,
   TextInput,
   View,
+  // typings
+  LayoutChangeEvent,
 } from 'react-native'
-import TextSize from 'react-native-text-size'
+import TextSize, {
+  // typings
+  TSMeasureResult,
+  TSTextBreakStrategy,
+  TSFontSpecs,
+  TSFontStyle,
+  TSFontVariant,
+  TSFontWeight,
+} from 'react-native-text-size'
+import { CrossPicker as Picker } from './src/CrossPicker'
 
-import type { ViewLayoutEvent } from 'ViewPropTypes'
-import type { TSMeasureResult, TSFontSpecs, TSFontVariant, TSTextBreakStrategy } from 'react-native-text-size'
-
-type PickerItemList = Array<string | void>
 type Props = {}
 type State = {
-  info?: TSMeasureResult | null,
+  info?: TSMeasureResult,
   specs: TSFontSpecs,
   text: string,
-  width: number,
-  allowFontScaling: boolean,
-  fonts?: string[] | void,
+  width?: number,
+  allowFontScaling?: boolean,
+  textBreakStrategy?: TSTextBreakStrategy,
+  fonts?: string[],
   layout?: { width: number, height: number }
 }
 
@@ -42,14 +48,13 @@ const TEXT_LEFT = 16
 const TEXT_WIDTH = 274
 
 const TEST_FONT: TSFontSpecs = {
-  fontFamily: 'GreatVibes-Regular',
-  fontSize: 28,
+  fontFamily: undefined,
+  fontSize: undefined,
   fontStyle: undefined,
   fontWeight: undefined,
   fontVariant: undefined,
   includeFontPadding: true,
   letterSpacing: undefined,
-  textBreakStrategy: undefined,
 }
 const TEXT_STR = 'This is a first string\n' +
 'The second string is slightly bigger ƒƒ \n' +
@@ -65,7 +70,7 @@ const reactNativeVersion = (): { major: number, minor: number, patch: number } =
 
 // 5 decimals max
 const formatNumber = (n: number) => {
-  return n.toFixed(6).replace(/\.?0+$/, '')
+  return n.toFixed(5).replace(/\.?0+$/, '')
 }
 
 export default class MeasureApp extends React.Component<Props, State> {
@@ -78,6 +83,7 @@ export default class MeasureApp extends React.Component<Props, State> {
       text: TEXT_STR,
       width: TEXT_WIDTH,
       allowFontScaling: true,
+      textBreakStrategy: undefined,
     }
 
     if (ANDROID) {
@@ -88,7 +94,7 @@ export default class MeasureApp extends React.Component<Props, State> {
     TextSize.fontFromSpecs({
       ...TEST_FONT,
     }).then((info) => {
-      console.log('Test font info:', info)
+      console.log('Initial font info:', info)
     }).catch(console.warn)
 
     const rn = reactNativeVersion()
@@ -98,15 +104,9 @@ export default class MeasureApp extends React.Component<Props, State> {
     console.log(`${IOS ? 'iOS' : 'Android SDK'} ${IOS || ANDROID}`)
 
     TextSize.specsForTextStyles()
-      .then((specs) => { console.log('specsForTextStyles: ', specs) })
+      .then((specs) => { console.log('specsForTextStyles:', specs) })
       .catch(console.error)
-    //console.log('TextSize.FontSize:', TextSize.FontSize)
-    //TextSize.fontForTextStyle('body').then(info => {
-    //  console.log(`Font info for body:`, info)
-    //})
-    //TextSize.fontForFontType('default').then(info => {
-    //  console.log(`Font info of "default":`, info)
-    //})
+    console.log('TextSize.FontSize:', TextSize.FontSize)
   }
 
   componentDidMount () {
@@ -114,9 +114,9 @@ export default class MeasureApp extends React.Component<Props, State> {
       text: this.state.text,
       width: this.state.width,
       allowFontScaling: this.state.allowFontScaling,
+      textBreakStrategy: this.state.textBreakStrategy,
       ...this.state.specs,
     }).then((info) => {
-      console.log('TextSize full info:', info)
       this.displayResult(info)
       this.setState({ info })
     }).catch((err) => {
@@ -132,10 +132,10 @@ export default class MeasureApp extends React.Component<Props, State> {
       info.width}, lastLineWidth: ${info.lastLineWidth}, lineCount: ${info.lineCount}`)
   }
 
-  doMeasure (prop: $Shape<TSFontSpecs>) {
-    const { specs, text, width, allowFontScaling } = this.state
+  doMeasure (prop: Partial<TSFontSpecs>) {
+    const { specs, text, width, allowFontScaling, textBreakStrategy } = this.state
     const specsParams = {
-      ...specs, text, width, allowFontScaling, ...prop,
+      ...specs, text, width, allowFontScaling, textBreakStrategy, ...prop,
     }
     TextSize.measure(specsParams).then((info) => {
       this.displayResult(info)
@@ -148,13 +148,13 @@ export default class MeasureApp extends React.Component<Props, State> {
     }).catch(console.error)
   }
 
-  setFontFamily = (fontFamily: string) => {
+  setFontFamily = (fontFamily: string | undefined) => {
     this.doMeasure({ fontFamily })
   }
-  setFontStyle = (fontStyle: $PropertyType<TSFontSpecs, 'fontStyle'>) => {
+  setFontStyle = (fontStyle: TSFontStyle | undefined) => {
     this.doMeasure({ fontStyle: fontStyle || undefined })
   }
-  setFontWeight = (fontWeight: $PropertyType<TSFontSpecs, 'fontWeight'>) => {
+  setFontWeight = (fontWeight: TSFontWeight | undefined) => {
     this.doMeasure({ fontWeight: fontWeight || undefined })
   }
   setFontSize = (ev: any) => {
@@ -165,9 +165,6 @@ export default class MeasureApp extends React.Component<Props, State> {
     const fs = parseFloat(ev.nativeEvent.text)
     this.doMeasure({ letterSpacing: fs || undefined })
   }
-  setTextBreakStrategy = (textBreakStrategy: TSTextBreakStrategy) => {
-    this.doMeasure({ textBreakStrategy })
-  }
   setIncludeFontPadding = (includeFontPadding: boolean) => {
     this.doMeasure({ includeFontPadding })
   }
@@ -176,9 +173,9 @@ export default class MeasureApp extends React.Component<Props, State> {
   }
 
   setAllowFontScaling = (allowFontScaling: boolean) => {
-    const { specs, text, width } = this.state
+    const { specs, text, width, textBreakStrategy } = this.state
     const specsParams = {
-      ...specs, text, width, allowFontScaling,
+      ...specs, text, width, allowFontScaling, textBreakStrategy,
     }
     TextSize.measure(specsParams).then((info) => {
       this.displayResult(info)
@@ -186,22 +183,33 @@ export default class MeasureApp extends React.Component<Props, State> {
     }).catch(console.error)
   }
 
-  onLayout = (e: ViewLayoutEvent) => {
+  setTextBreakStrategy = (textBreakStrategy: TSTextBreakStrategy) => {
+    const { specs, text, width, allowFontScaling } = this.state
+    const specsParams = {
+      ...specs, text, width, allowFontScaling, textBreakStrategy,
+    }
+    TextSize.measure(specsParams).then((info) => {
+      this.displayResult(info)
+      this.setState({ textBreakStrategy })
+    }).catch(console.error)
+  }
+
+  onLayout = (e: LayoutChangeEvent) => {
     const info = e.nativeEvent.layout
     this.setState({ layout: { width: info.width, height: info.height } })
     console.log(`onLayout info - height: ${info.height}, width: ${info.width}`)
   }
 
-  renderPickerItems (items: PickerItemList) {
-    // $FlowSucks ...come on
-    return items.map((str) => {
-      const name = str === undefined ? '(undefined)' : str
-      return  <Picker key={`key-${name}`} label={name} value={str || ''} />
-    })
-  }
-
   render () {
-    const { info, specs, text, allowFontScaling, fonts, layout } = this.state
+    const {
+      info,
+      specs,
+      text,
+      allowFontScaling,
+      textBreakStrategy,
+      fonts,
+      layout
+    } = this.state
 
     let sizes, infoStat, posStyle
     if (info) {
@@ -212,16 +220,16 @@ export default class MeasureApp extends React.Component<Props, State> {
         minWidth: info.width,
       }
       posStyle = { left: info.lastLineWidth, top: TEXT_TOP + info.height }
-      infoStat = `TextSize height: ${formatNumber(info.height)}, width: ${formatNumber(
-        info.width)}\n  lastLineWidth: ${formatNumber(info.lastLineWidth)} lines: ${info.lineCount}`
+      infoStat = `TextSize height ${formatNumber(info.height)}, width ${formatNumber(
+        info.width)}\n  lastLineWidth ${formatNumber(info.lastLineWidth)}, lines: ${info.lineCount}`
     } else {
       sizes = { width: -1 }
       posStyle = { left: 10, top: 50 }
       infoStat = 'waiting for text-size...'
     }
 
-    const layoutStat = layout ? `onLayout height: ${
-      formatNumber(layout.height)}, width: ${formatNumber(layout.width)} ` : ' '
+    const layoutStat = layout ? `onLayout height ${
+      formatNumber(layout.height)}, width ${formatNumber(layout.width)} ` : ' '
 
     return (
       <SafeAreaView style={styles.container}>
@@ -246,44 +254,41 @@ export default class MeasureApp extends React.Component<Props, State> {
               style={styles.pickerBox}
               selectedValue={specs.fontFamily}
               onValueChange={this.setFontFamily}
-              key="fontFamily"
-            >
-              {fonts && this.renderPickerItems([undefined, ...fonts])}
-            </Picker>
+              items={fonts}
+            />
           </View>
           <View style={styles.row}>
-            <Text styles={styles.prompt}>fontStyle:</Text>
+            <Text style={styles.prompt}>fontStyle:</Text>
             <Picker
               style={styles.pickerBox}
               selectedValue={specs.fontStyle}
               onValueChange={this.setFontStyle}
-            >
-              {this.renderPickerItems([undefined, 'normal', 'italic'])}
-            </Picker>
+              items={[undefined, 'normal', 'italic']}
+            />
           </View>
           {IOS &&
             <View style={styles.row}>
-              <Text styles={styles.prompt}>fontVariant:</Text>
+              <Text style={styles.prompt}>fontVariant:</Text>
               <Picker
                 style={styles.pickerBox}
                 selectedValue={specs.fontVariant && specs.fontVariant[0] || ''}
-                onValueChange={this.setFontVariant}>
-                {this.renderPickerItems([undefined,
-                  'small-caps', 'oldstyle-nums', 'lining-nums', 'tabular-nums', 'proportional-nums'])}
-              </Picker>
+                onValueChange={this.setFontVariant}
+                items={[undefined, 'small-caps',
+                  'oldstyle-nums', 'lining-nums', 'tabular-nums', 'proportional-nums']}
+              />
             </View>
           }
           <View style={styles.row}>
-            <Text styles={styles.prompt}>fontWeight:</Text>
+            <Text style={styles.prompt}>fontWeight:</Text>
             <Picker
               style={styles.pickerBox}
               selectedValue={specs.fontWeight}
-              onValueChange={this.setFontWeight}>
-              {this.renderPickerItems([undefined, 'normal', 'bold'])}
-            </Picker>
+              onValueChange={this.setFontWeight}
+              items={[undefined, 'normal', 'bold']}
+            />
           </View>
           <View style={styles.row}>
-            <Text styles={styles.prompt}>fontSize:</Text>
+            <Text style={styles.prompt}>fontSize:</Text>
             <TextInput
               ref="fontSizeInput"
               style={styles.numeric}
@@ -291,12 +296,11 @@ export default class MeasureApp extends React.Component<Props, State> {
               keyboardType="numeric"
               placeholder="enter size"
               defaultValue={specs.fontSize && specs.fontSize > 0 ? String(specs.fontSize) : ''}
-              key="fontSize"
               onEndEditing={this.setFontSize}
             />
           </View>
           <View style={styles.row}>
-            <Text styles={styles.prompt}>letterSpacing:</Text>
+            <Text style={styles.prompt}>letterSpacing:</Text>
             <TextInput
               ref="letterSpacingInput"
               style={styles.numeric}
@@ -309,18 +313,17 @@ export default class MeasureApp extends React.Component<Props, State> {
           </View>
           {ANDROID &&
             <View style={styles.row}>
-              <Text styles={styles.prompt}>textBreakStrategy:</Text>
+              <Text style={styles.prompt}>textBreakStrategy:</Text>
               <Picker
                 style={styles.pickerBox}
-                selectedValue={specs.textBreakStrategy}
+                selectedValue={textBreakStrategy}
                 onValueChange={this.setTextBreakStrategy}
-              >
-                {this.renderPickerItems([undefined, 'highQuality', 'balanced', 'simple'])}
-              </Picker>
+                items={[undefined, 'highQuality', 'balanced', 'simple']}
+              />
             </View>
           }
           <View style={styles.row}>
-            <Text styles={styles.prompt}>allowFontScaling:</Text>
+            <Text style={styles.prompt}>allowFontScaling:</Text>
             <Switch
               style={styles.switchBox}
               value={allowFontScaling}
@@ -330,7 +333,7 @@ export default class MeasureApp extends React.Component<Props, State> {
 
           {ANDROID &&
             <View style={styles.row}>
-              <Text styles={styles.prompt}>includeFontPadding:</Text>
+              <Text style={styles.prompt}>includeFontPadding:</Text>
               <Switch
                 style={styles.switchBox}
                 value={specs.includeFontPadding}
@@ -351,7 +354,7 @@ export default class MeasureApp extends React.Component<Props, State> {
 
             <Text
               allowFontScaling={allowFontScaling}
-              style={[styles.sample, (specs: any)]}
+              style={[styles.sample, specs as any]}
               onLayout={this.onLayout}>
               {text}
             </Text>
@@ -369,10 +372,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     //...StyleSheet.absoluteFillObject,
-    //paddingTop: (StatusBar.currentHeight | 0) + 8,
     ...Platform.select({
       android: {
-        marginTop: StatusBar.currentHeight | 0,
+        marginTop: StatusBar.currentHeight || 0,
       },
     }),
   },
@@ -380,18 +382,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 40,
+    minHeight: IOS ? 56 : 40,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   lastRow: {
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     minHeight: 44,
     paddingTop: 8,
     paddingBottom: 12,
   },
   prompt: {
-    //height: '100%',
+    paddingRight: 4,
     textAlignVertical: 'center',
   },
   statusText: {
@@ -422,6 +424,7 @@ const styles = StyleSheet.create({
   },
   pickerBox: {
     flexGrow: 1,
+    alignSelf: 'center',
     marginLeft: 4,
   },
   numeric: {

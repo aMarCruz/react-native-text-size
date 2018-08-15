@@ -11,7 +11,7 @@ module.exports = {
   // ----------------------------------------
   // Parser
 
-  parser: 'babel-eslint',
+  parser: 'typescript-eslint-parser',
 
   parserOptions: {
     ecmaVersion: 2017,
@@ -46,9 +46,6 @@ module.exports = {
 
   globals: {
     __DEV__: READONLY,
-    $PropertyType: READONLY,
-    $Shape: READONLY,
-    $Subtype: READONLY,
     require: READONLY,
   },
 
@@ -132,7 +129,7 @@ module.exports = {
     'no-throw-literal': ON,
     'no-trailing-spaces': ON,
     'no-undef-init': ON,
-    'no-undef': ON,
+    'no-undef': OFF,                // handled by TS
     'no-unexpected-multiline': ON,
     'no-unmodified-loop-condition': WARN,
     'no-unneeded-ternary': ON,

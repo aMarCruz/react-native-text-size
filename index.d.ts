@@ -13,12 +13,20 @@ declare module "react-native-text-size" {
     readonly system: number,
   }
 
-  // export type TSMDStyleSpec =
-  // | 'h1'
-  // | 'h2'
-  // | 'h3'
-  // | 'h4'
-  // | 'h5'
+  export type TSMDStyleSpec =
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'subtitle1'
+  | 'subtitle2'
+  | 'body1'
+  | 'body2'
+  | 'button'
+  | 'caption'
+  | 'overline'
 
   export type TSTextStyle =
   | 'body'
@@ -28,6 +36,7 @@ declare module "react-native-text-size" {
   | 'footnote'
   | 'headline'
   | 'subheadline'
+  | 'largeTitle'
   | 'title1'
   | 'title2'
   | 'title3'
@@ -57,11 +66,23 @@ declare module "react-native-text-size" {
     fontWeight?: TSFontWeight;
     /** @platform ios */
     fontVariant?: Array<TSFontVariant>;
+    /** iOS all, Android SDK 21+ with RN 0.55+ */
     letterSpacing?: number;
     /** @platform android */
     includeFontPadding?: boolean;
     /** @platform android (SDK 23+) */
     textBreakStrategy?: TSTextBreakStrategy;
+  }
+
+  export type TSFontTextStyle = {
+    fontFamily: string | void,
+    fontSize: number,
+    fontStyle: TSFontStyle,
+    fontWeight: TSFontWeight,
+    /** @platform ios */
+    fontVariant?: Array<TSFontVariant> | null,
+    /** iOS all, Android SDK 21+ with RN 0.55+ */
+    letterSpacing?: number,
   }
 
   export interface TSMeasureParams extends TSFontSpecs {
@@ -84,10 +105,9 @@ declare module "react-native-text-size" {
     readonly FontSize: TSFontSize;
 
     measure(params: TSMeasureParams): Promise<TSMeasureResult>;
-    specsForTextStyles(): Promise<{ [key: string]: TSFontSpecs }>;
+    specsForTextStyles(): Promise<{ [key: string]: TSFontTextStyle }>;
     fontFromSpecs(specs?: TSFontSpecs): Promise<TSFontInfo>;
     fontFamilyNames(): Promise<string[]>;
-    fontNamesForFamilyName(fontFamily: string): Promise<string[]>;
   }
 
   const TextSize: TextSizeStatic;

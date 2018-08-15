@@ -8,13 +8,25 @@
     "setup": "rm -rf ./node_modules && yarn --no-lockfile && node ./ins-text-size",
     "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && cd android && ./gradlew clean",
     "clean:watchman": "watchman watch-del-all",
+    "tsc": "tsc",
     "test": "node ./ins-text-size"
   },
   "dependencies": {
-    "react": "16.4.1",
-    "react-native": "0.56.0"
+    "react": "16.2.0",
+    "react-lifecycles-compat": "^3.0.4",
+    "react-native": "0.52.0"
   },
   "devDependencies": {
+    "@types/react": "^16.4.10",
+    "@types/react-native": "^0.56.8",
+    "babel-eslint": "^8.2.6",
+    "babel-preset-react-native": "4.0.0",
+    "eslint": "^5.3.0",
+    "eslint-plugin-react": "^7.11.1",
+    "react-native-typescript-transformer": "^1.2.10",
+    "tslib": "^1.9.3",
+    "typescript": "^2.9.0",
+    "typescript-eslint-parser": "^18.0.0",
     "which": "^1.3.1"
   },
   "rnpm": {
