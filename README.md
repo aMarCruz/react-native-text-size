@@ -29,7 +29,7 @@ $ react-native link react-native-text-size
 
 1. In XCode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
 2. Go to `node_modules` ➜ `react-native-text-size` and add `RNTextSize.xcodeproj`
-3. In XCode, in the project navigator, select your project. Add `libRNMeasureText.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
+3. In XCode, in the project navigator, select your project. Add `libRNTextSize.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
 4. Run your project (`Cmd+R`)<
 
 #### Android
@@ -71,11 +71,11 @@ fontFamily | string | OS dependent | The default is the same applied by React Na
 fontWeight | string | 'normal' | On android, numeric ranges has no granularity and '500' to '900' becomes 'bold', but you can use fonts of specific weights, like "sans-serif-medium".
 fontSize   | number | 14       | The default value is that used by RN and is provided in the `TextSize.FontSize.default` constant.
 fontStyle  | string | 'normal' | One of "normal" or "italic".
+fontVariant        | array   | (none)        | iOS only.
 allowFontScaling | boolean | true | Apply user accessibility settings (i.e. use SP units).
-letterSpacing    | number  | 0    | Additional spacing between letters (ignored in Android if SDK < 21 or RN < 0.55).
+letterSpacing    | number  | 0    | Additional spacing between letters (for Android SDK >= 21 and RN >= 0.55).
 includeFontPadding | boolean | true | Android only. Include additional top and bottom padding.
 textBreakStrategy  | string  | 'highQuality' | Android API 23+ only: 'simple', 'balanced', or 'highQuality'
-fontVariant        | array   | (none)        | iOS only.
 
 **TSMeasureResult**
 
@@ -83,7 +83,7 @@ Promise that resolves to a plain JS object with units in [Density Independent Pi
 
 Property  | Type   | Notes
 --------- | ------ | ------
-width     | number | Total width.
+width     | number | Total width. It may be less or equal to the given width.
 height    | number | Total height, including top and bottom padding if `includingFontPadding` was given.
 lastLineWidth | number | Width of the last line, excluding trailing blanks.
 lineCount | number | Number of lines, taking into account hard and automatic line breaks.

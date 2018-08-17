@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   },
   buttonBar: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'space-between',
     paddingTop: 8,
     paddingBottom: 12,
     marginLeft: -10,

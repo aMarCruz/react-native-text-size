@@ -64,3 +64,8 @@ repositories {
 dependencies {
     compile 'com.facebook.react:react-native:+'
 }
+
+task customClean(type: Delete) {
+    delete rootProject.buildDir
+}
+clean.dependsOn customClean

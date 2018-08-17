@@ -13,7 +13,7 @@
 #import <CoreText/CoreText.h>
 #import "RNTextSize.h"
 
-#define _DEBUG_THIS 1
+#define _DEBUG 1
 
 static NSString *const E_MISSING_TEXT = @"E_MISSING_TEXT";
 static NSString *const E_INVALID_FONT_SPEC = @"E_INVALID_FONT_SPEC";
@@ -90,23 +90,24 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
     return;
   }
 
+  // Allow empty text without generating error
+  // TODO: Return the same height as RN.
+  if (!text.length) {
+    resolve(@{
+              @"width": @0,
+              @"height": @(font.pointSize),
+              @"lastLineWidth": @0,
+              @"lineCount": @0,
+              });
+    return;
+  }
+
   // We cann't use RCTConvert since it does not handle font scaling and RN
   // does not scale the font if a custom delegate has been defined to create.
   //UIFont * _Nullable font = [RCTConvert UIFont:options];
   UIFont *const _Nullable font = [RNTextSize UIFontFromUserSpecs:options withBridge:_bridge];
   if (!font) {
     reject(E_INVALID_FONT_SPEC, @"Invalid font specification.", nil);
-    return;
-  }
-
-  // Allows empty text here
-  if (!text.length) {
-    resolve(@{
-              @"width": @0,
-              @"height": @(font.pointSize),
-              @"lineCount": @0,
-              @"lineHeight": @(font.lineHeight),
-              });
     return;
   }
 
@@ -153,7 +154,7 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
                                  @"height": @(height),
                                  @"lastLineWidth": @(lastLineWidth),
                                  @"lineCount": @(lineCount),
-#if _DEBUG_THIS
+#if _DEBUG
                                  @"_fontLineHeight": @(font.lineHeight),
                                  @"_rawWidth": @(size.width),
                                  @"_rawHeight": @(size.height),
@@ -276,7 +277,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 // ============================================================================
 //
 
-#if _DEBUG_THIS
+#if _DEBUG
 - (CGSize)getLineCountAndLastLineWidth:(NSLayoutManager *)layoutManager {
   NSRange lineRange;
   CGRect lastLineRect = CGRectZero;

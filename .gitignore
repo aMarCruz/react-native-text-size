@@ -1,16 +1,13 @@
-# OSX
-#
-.DS_Store
-
 # node.js
 #
 node_modules/
-npm-debug.log
-yarn-error.log
+*.log
+*.bak
 yarn.lock
 
-# Xcode
+# OSX / Xcode
 #
+.DS_Store
 build/
 *.pbxuser
 !default.pbxuser
@@ -31,9 +28,9 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
-build/
 .idea
 .gradle
+android/build/
 local.properties
 *.iml
 
@@ -43,6 +40,7 @@ buck-out/
 *.keystore
 
 # Development
+.bak/
 .docs/
-**/*.bak
-**/.vscode/.react
+**/.vscode/.react/
+*.tgz

@@ -1,14 +1,8 @@
 {
   "name": "react-native-text-size",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.4",
   "description": "Measure text height and width without rander it out in Android or iOS.",
   "main": "index.js",
-  "files": [
-    "*.ts",
-    "*.flow",
-    "android",
-    "ios"
-  ],
   "keywords": [
     "react-native",
     "measure",
@@ -31,6 +25,9 @@
   "homepage": "https://github.com/aMarCruz/react-native-text-size",
   "author": "aMarCruz <amarcruzbox_git@yahoo.com>",
   "license": "BSD-2-Clause",
+  "scripts": {
+    "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && cd android && ./gradlew clean"
+  },
   "peerDependencies": {
     "react-native": ">=0.52.0"
   },

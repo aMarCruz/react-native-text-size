@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Layout;
 
-import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.modules.systeminfo.ReactNativeVersion;
@@ -15,24 +14,21 @@ import java.util.Map;
 
 final class RNTextSizeConf {
     private static final float DEF_FONTSIZE = 14.0f;
-    private static final int rnVersion;
-    private static final ReadableMap emptySpecs;
+    private static final int reactNativeVersion;
 
     static {
-        emptySpecs = Arguments.createMap();
-
         int version = 0;
         try {
             Map<String, Object> rnv = ReactNativeVersion.VERSION;
             version = ((int) rnv.get("major") << 16) | (int) rnv.get("minor");
         } catch (Exception ignore) {
         }
-        rnVersion = version;
+        reactNativeVersion = version;
     }
 
-    @NonNull
-    static RNTextSizeConf empty() {
-        return new RNTextSizeConf(emptySpecs, false);
+    // letterSpacing is supported in RN 0.55+
+    static boolean supportLetterSpacing() {
+        return reactNativeVersion >= 55;
     }
 
     static float getDefaultFontSize() {
@@ -59,15 +55,19 @@ final class RNTextSizeConf {
         mOpts = options;
 
         int _fontStyle = "italic".equals(getString("fontStyle")) ? Typeface.ITALIC : Typeface.NORMAL;
-        switch (getNonNullString("fontWeight")) {
-            case "bold":
-            case "900":
-            case "800":
-            case "700":
-            case "600":
-            case "500":
-                _fontStyle |= Typeface.BOLD;
-                break;
+
+        final String _fontWeight = getString("fontWeight");
+        if (_fontWeight != null) {
+            switch (_fontWeight) {
+                case "bold":
+                case "900":
+                case "800":
+                case "700":
+                case "600":
+                case "500":
+                    _fontStyle |= Typeface.BOLD;
+                    break;
+            }
         }
 
         allowFontScaling = forText && getBooleanOrTrue("allowFontScaling");
@@ -88,23 +88,6 @@ final class RNTextSizeConf {
     String getString(@NonNull final String name) {
         return mOpts.hasKey(name)
                 ? mOpts.getString(name) : null;
-    }
-
-    // letterSpacing is supported in RN 0.55+
-    static boolean supportLetterSpacing() {
-        return rnVersion >= 55;
-    }
-
-    @NonNull
-    private String getNonNullString(@NonNull final String name) {
-        if (mOpts.hasKey(name)) {
-            final String str = mOpts.getString(name);
-
-            if (str != null) {
-                return str;
-            }
-        }
-        return "";
     }
 
     @TargetApi(23)
