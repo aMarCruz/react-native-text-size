@@ -1,13 +1,13 @@
-// @ts-check
 import React from 'react'
 import { Picker } from 'react-native'
 
+// typings
+import { PickerItems, PickerOptions } from './CrossPicker'
+
 /**
  * Render the items.
- * @param {PickerItems} items
  */
-const renderItems = (items) => {
-  // $FlowSucks ...come on
+const renderItems = (items: PickerItems) => {
   return items.map((str) => {
     const name = str === undefined ? '(undefined)' : String(str)
     return  <Picker.Item key={`key-${name}`} label={name} value={str} />
@@ -15,10 +15,9 @@ const renderItems = (items) => {
 }
 
 /**
- * Wrapper for PickerAndroid
- * @param {PickerOptions} props
+ * Simple wrapper for PickerAndroid
  */
-export const CrossPicker = (props) => {
+export const CrossPicker = (props: PickerOptions) => {
   const { items, ...pickerProps } = props
   return (
     <Picker mode="dropdown" {...pickerProps}>

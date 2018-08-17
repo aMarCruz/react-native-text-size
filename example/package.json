@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
-    "postsetupNO": "react-native link react-native-text-size",
-    "setup": "rm -rf ./node_modules && yarn --no-lockfile && node ./ins-text-size",
+    "postsetup": "react-native link",
+    "setup": "rm -rf ./node_modules && yarn && node ./ins-text-size",
     "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && cd android && ./gradlew clean",
     "clean:watchman": "watchman watch-del-all",
     "tsc": "tsc",
@@ -14,7 +14,8 @@
   "dependencies": {
     "react": "16.2.0",
     "react-lifecycles-compat": "^3.0.4",
-    "react-native": "0.52.0"
+    "react-native": "0.52.0",
+    "react-native-prompt-android": "^0.3.3"
   },
   "devDependencies": {
     "@types/react": "^16.4.10",

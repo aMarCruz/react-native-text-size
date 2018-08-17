@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-prompt-android')
     compile project(':react-native-text-size')
     compile fileTree(dir: "libs", include: ["*.jar"])
     compile "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"

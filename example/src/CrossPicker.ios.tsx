@@ -1,33 +1,28 @@
-// @ts-check
 import React from 'react'
 import { ActionSheetIOS, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { polyfill } from 'react-lifecycles-compat'
+import { defaultFontSize } from './constants'
 
-/**
- * @typedef {Object} State
- * @prop {string} title - Button text
- * @prop {PickerItemValue} prevValue - For getDerivedStateFromProps
- */
+// typings
+import { PickerOptions, PickerItemValue } from './CrossPicker'
+
+type Props = PickerOptions
+type State = { title: string, prevValue: PickerItemValue }
 
 const _noop = () => {}
 
 /**
  * Simple component Text that responds to touches w/an UIActionSheet.
  * PickerAndroid equivalent.
- *
- * @augments {React.PureComponent<PickerOptions>}
  */
-class CrossPicker extends React.PureComponent {
+class CrossPicker extends React.PureComponent<PickerOptions, State> {
 
-  /* @type State */
   state = { title: '', prevValue: '' }
 
   /**
    * Any time the value changes, reset the state.
-   * @param {PickerOptions} props
-   * @param {State} state
    */
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps (props: Props, state: State) {
     const newValue = props.selectedValue
 
     if (newValue !== state.prevValue) {
@@ -43,9 +38,9 @@ class CrossPicker extends React.PureComponent {
   }
 
   /**
-   * @param {number} index Selected item
+   * User pressed an item
    */
-  _onItemPress = (index) => {
+  _onItemPress = (index: number) => {
     const { items, onValueChange } = this.props
 
     if (items && index >= 0 && index < items.length && onValueChange) {
@@ -75,7 +70,6 @@ class CrossPicker extends React.PureComponent {
   }
 
   render () {
-    const { title } = this.state
     const { style, enabled } = this.props
 
     return (
@@ -88,7 +82,7 @@ class CrossPicker extends React.PureComponent {
             style={styles.textButton}
             numberOfLines={1}
           >
-            {title}
+            {this.state.title}
           </Text>
           <Text style={styles.downArrow}>{'\u2304'}</Text>
         </View>
@@ -113,7 +107,7 @@ const styles = StyleSheet.create({
   },
   downArrow: {
     alignSelf: 'flex-end',
-    fontFamily: 'Arial',
+    fontSize: defaultFontSize,
     color: 'black',
   },
 })

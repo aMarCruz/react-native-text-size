@@ -16,6 +16,24 @@ buildscript {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force "com.android.support:appcompat-v7:$rootProject.supportLibVersion"
+        force "com.android.support:support-v4:$rootProject.supportLibVersion"
+    }
+}
+
+subprojects {
+    afterEvaluate {project ->
+        if (project.hasProperty("android")) {
+            android {
+                compileSdkVersion rootProject.compileSdkVersion
+                buildToolsVersion rootProject.buildToolsVersion
+            }
+        }
+    }
+}
+
 allprojects {
     repositories {
         mavenLocal()

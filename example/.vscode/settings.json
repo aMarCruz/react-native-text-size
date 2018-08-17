@@ -1,4 +1,4 @@
 {
-  "typescript.autoImportSuggestions.enabled": true,
   "typescript.disableAutomaticTypeAcquisition": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
 }

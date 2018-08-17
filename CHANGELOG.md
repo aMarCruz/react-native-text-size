@@ -14,6 +14,7 @@ _The package id has changed, you must uninstall the previous version before usin
 - New functions `specsForTextStyles`, `fontFromSpecs`, and `fontFamilyNames`
 
 ### Changed
+- Complete rewrite of the example app.
 - Simplify anroid/build.gradle and adjust the configuration.
 - `allowFontScaling` is handled in the native side, index.js was simplified a lot.
 - Migration of example to RN 0.52 and Typescript, enhanced features.
