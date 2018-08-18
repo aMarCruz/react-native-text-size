@@ -208,7 +208,7 @@ letterSpacing | number | 0
 
 <a name="tsfontinfo"></a> **TSFontInfo**
 
-JS object, fully compatible with RN Text Style, with info for the given font and size, in [_sp_](https://developer.android.com/guide/topics/resources/more-resources#Dimension) in Android or points in iOS, and floating point numbers.
+JS object, ~~fully compatible with RN Text Style~~, with info for the given font and size, in [_sp_](https://developer.android.com/guide/topics/resources/more-resources#Dimension) in Android or points in iOS, and floating point numbers.
 
 Using float numbers is more accurate\* than integers and allows you to use your preferred rounding method.
 Remember RN doesn't work with subpixels in Android and will truncate this values.
