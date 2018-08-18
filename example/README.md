@@ -2,7 +2,7 @@
 
 Test interactively the behavior of rnTextSize.
 
-This app is using React Native 0.52.0, the minimal supported RN version, and is written in Typescript 2.9 with ES2017 sources.
+This app is using React Native v0.52.0, the minimal supported version, and is written in Typescript 2.9 with ES2017 sources.
 
 Please clone the repo and follow the instruction of the [Setup](#setup) section.
 
