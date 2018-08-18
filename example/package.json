@@ -1,7 +1,7 @@
 {
   "name": "example",
   "version": "0.0.1",
-  "private": true,
+  "main": "index.js",
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "postsetup": "react-native link",
@@ -34,5 +34,6 @@
     "assets": [
       "./assets/fonts"
     ]
-  }
+  },
+  "license": "MIT"
 }

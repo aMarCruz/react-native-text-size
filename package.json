@@ -1,7 +1,7 @@
 {
   "name": "react-native-text-size",
   "version": "2.0.0-beta.4",
-  "description": "Measure text height and width without rander it out in Android or iOS.",
+  "description": "Measure text accurately before laying it out and get font information from your App",
   "main": "index.js",
   "keywords": [
     "react-native",

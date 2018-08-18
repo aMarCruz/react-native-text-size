@@ -3,7 +3,7 @@
 [![npm Version][npm-image]][npm-url]
 [![License][license-image]][license-url]
 
-Measure text accurately before rendering and get font information from your App (Android and iOS).
+Measure text accurately before laying it out and get font information from your App (Android and iOS).
 
 The text to be measured is required, the rest of the parameters supported are optional and work in the same way as with React Native:
 

@@ -9,12 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 _The package id has changed, you must uninstall the previous version before using this one._
 
 ### Added
+- Note on the README of the sample App, to test it with a different version of RN.
 - Adds flow typings (almost) working with Flow 0.61.x
-- Enhancements to the example with RN 0.56 and Flow
+- Enhancements to the sample App with RN 0.56 and Flow
 - New functions `specsForTextStyles`, `fontFromSpecs`, and `fontFamilyNames`
 
 ### Changed
-- Complete rewrite of the example app.
+- Complete rewrite of the sample app.
 - Simplify anroid/build.gradle and adjust the configuration.
 - `allowFontScaling` is handled in the native side, index.js was simplified a lot.
 - Migration of example to RN 0.52 and Typescript, enhanced features.
@@ -27,6 +28,7 @@ _The package id has changed, you must uninstall the previous version before usin
 - Drop support for iOS 8 and RN below 0.52
 
 ### Fixes
+- Tested on iOS 9 & 11 simulators, Android devices 5.1 & 7, simulator 4.4 & 11, all with RN 0.52.0 and 0.56.0
 - Improved measurement on both platforms, accuracy is more than 5 decimals.
 - The iOS API and behavior of `measure` now is the same as Android.
 - Makes the example works.
