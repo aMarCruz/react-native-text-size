@@ -95,7 +95,7 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
   if (!text.length) {
     resolve(@{
               @"width": @0,
-              @"height": @(font.pointSize),
+              @"height": @0,
               @"lastLineWidth": @0,
               @"lineCount": @0,
               });
@@ -178,7 +178,7 @@ RCT_EXPORT_METHOD(specsForTextStyles:(RCTPromiseResolveBlock)resolve
   if (@available(iOS 11.0, *)) {
     textStyleLargeTitle = UIFontTextStyleLargeTitle;
   } else {
-    textStyleLargeTitle = [NSNull null];
+    textStyleLargeTitle = (id) [NSNull null];
   }
 
   NSDictionary<NSString *, UIFontTextStyle>
@@ -261,6 +261,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 {
   if (isNull(fontFamily)) {
     reject(E_INVALID_FONTFAMILY, @"Missing fontFamily name.", nil);
+    return;
   } else {
     NSArray<NSString *> *fontNames = [UIFont fontNamesForFamilyName:fontFamily];
     if (fontNames) {
