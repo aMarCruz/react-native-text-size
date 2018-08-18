@@ -457,9 +457,9 @@ const styles = StyleSheet.create({
   },
   buttonBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     paddingTop: 8,
     paddingBottom: 12,
-    marginLeft: -10,
+    marginRight: 4,
   },
 })

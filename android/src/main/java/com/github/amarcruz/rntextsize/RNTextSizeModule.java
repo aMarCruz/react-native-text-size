@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.BoringLayout;
 import android.text.Layout;
+import android.text.Spannable;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
@@ -85,8 +86,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        final String text = conf.getString("text");
-        if (text == null) {
+        final String _text = conf.getString("text");
+        if (_text == null) {
             promise.reject(E_MISSING_TEXT, "Missing required text.");
             return;
         }
@@ -95,7 +96,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         final boolean includeFontPadding = conf.includeFontPadding;
         final WritableMap result = Arguments.createMap();
 
-        if (text.isEmpty()) {
+        if (_text.isEmpty()) {
             // RN 0.56 consistently sets the height at 14dp divided by the density
             // plus 1 if includeFontPadding when text is empty, so we do the same.
             float height = (14.0f / density) + (includeFontPadding ? 1 : 0);
@@ -107,15 +108,10 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             return;
         }
 
+        final Spannable text = RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, _text);
         final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        final Typeface typeface = resetPaintWithFont(textPaint, conf);
-        if (typeface == null) {
-            promise.reject(E_INVALID_FONT_SPEC, "Invalid font specification.");
-            return;
-        }
 
-        // no width or width <= 0 becomes an unconstrained width
-        //conf.getPositiveNonZeroFloat("width", Float.MAX_VALUE);
+        // No width or width <= 0 becomes an unconstrained width
         float width = conf.getFloatOrNaN("width");
         if (!Float.isNaN(width) && width > 0) {
             width = width * density;                // always DIP
@@ -175,23 +171,28 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             }
 
             final int lineCount = layout.getLineCount();
+            float rectWidth = 0f;
+            float lastWidth = 0f; // also for lastLineWidth
 
-            result.putDouble("width", layout.getWidth() / density);
+            // Layout.getWidth() returns the configured max width, we must go slow
+            // to get the used one (and with the text trimmed).
+            for (int i = 0; i < lineCount; i++) {
+                lastWidth = layout.getLineMax(i);
+                if (lastWidth > rectWidth) {
+                    rectWidth = lastWidth;
+                }
+            }
+
+            result.putDouble("width", Math.min(rectWidth / density, width));
             result.putDouble("height", layout.getHeight() / density);
-            result.putDouble("lastLineWidth", layout.getLineMax(lineCount - 1) / density);
+            result.putDouble("lastLineWidth", lastWidth / density);
             result.putInt("lineCount", lineCount);
 
             if (_DEBUG) {
                 result.putInt("_topPadding", layout.getTopPadding());
                 result.putInt("_bottomPadding", layout.getBottomPadding());
-                result.putDouble("_getWidth", layout.getWidth());
-                for (int i = 0; i < lineCount; i++) {
-                    result.putDouble("_lineWidth_" + i, layout.getLineWidth(i));
-                    result.putDouble("_lineMax_" + i, layout.getLineMax(i));
-                    result.putDouble("_lineStart_" + i, layout.getLineStart(i));
-                }
+                result.putDouble("_rectWidth", rectWidth);
             }
-
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject(E_UNKNOWN_ERROR, e);
@@ -337,9 +338,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Reinitialize the TextPaint object with the required font.
+     * Make a Typeface from the supplied specification.
      * @param conf Font specification.
-     * @return The typeface used to draw in the TextPaint, null if error.
      */
     @NonNull
     private Typeface createTypefaceFromConf(
@@ -361,8 +361,13 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         return typeface != null ? typeface : Typeface.defaultFromStyle(style);
     }
 
+    /**
+     * Reinitialize the TextPaint object with the required font.
+     * @param conf Font specification.
+     * @return The typeface used to draw in the TextPaint, null if error.
+     */
     private Typeface resetPaintWithFont(
-            @NonNull final Paint paint,
+            @NonNull final TextPaint paint,
             @NonNull final RNTextSizeConf conf,
             @NonNull Typeface typeface
     ) {
@@ -373,6 +378,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
                 ? PixelUtil.toPixelFromSP(conf.fontSize)
                 : PixelUtil.toPixelFromDIP(conf.fontSize));
         paint.setTextSize(fontSize);
+        Log.d(TAG, "paint -> fontSize " + conf.fontSize +
+                ", textSize(): " + paint.getTextSize() + ", allowFontScaling " + conf.allowFontScaling);
 
         // No need to reset letterSpacing after paint.reset()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -380,22 +387,14 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
                 final float letterSpacing = conf.allowFontScaling
                         ? PixelUtil.toPixelFromSP(conf.letterSpacing)
                         : PixelUtil.toPixelFromDIP(conf.letterSpacing);
-                Log.d(TAG, ">>> letterSpacing converted from " + conf.letterSpacing + " to " + letterSpacing);
-                Log.d(TAG, ">>> paint has textSize of " + paint.getTextSize());
-                Log.d(TAG, ">>> tiene que coincidir con el calculado de " + fontSize);
-                Log.d(TAG, ">>> resulting letterSpacing: " + (letterSpacing /  paint.getTextSize()));
                 paint.setLetterSpacing(letterSpacing / paint.getTextSize());
-            } else {
-                Log.d(TAG,"No se puso letterSpacing, su valor es NAN");
             }
-        } else {
-            Log.d(TAG,"No se puso letterSpacing, el API es " + Build.VERSION.SDK_INT + ", se requiere el 21");
         }
 
         return typeface;
     }
 
-    private Typeface resetPaintWithFont(@NonNull final Paint paint, @NonNull final RNTextSizeConf conf) {
+    private Typeface resetPaintWithFont(@NonNull final TextPaint paint, @NonNull final RNTextSizeConf conf) {
         return resetPaintWithFont(paint, conf, createTypefaceFromConf(conf));
     }
 

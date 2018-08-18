@@ -14,6 +14,7 @@ const iOS = Platform.OS == 'ios'
 const Android = !iOS
 
 const vs = function<T>(v: T) { return v == null ? `(${v})` : v }
+const rn = (n: number) => (n % 1 ? n.toFixed(5) : n)
 
 const renderBody = (font: TSFontInfo) => {
   return (
@@ -85,11 +86,11 @@ const renderBody = (font: TSFontInfo) => {
       </View>
       <View style={styles.row}>
         <Text style={styles.text}>Screen size:</Text>
-        <Text style={styles.info}>{`${scrnDim.width}x${scrnDim.height}`}</Text>
+        <Text style={styles.info}>{`${Math.round(scrnDim.width)}x${Math.round(scrnDim.height)}`}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.text}>Screen scale:</Text>
-        <Text style={styles.info}>{scrnDim.scale}</Text>
+        <Text style={styles.info}>{rn(scrnDim.scale)}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.text}>Font scale:</Text>

@@ -54,30 +54,18 @@ final class RNTextSizeConf {
     RNTextSizeConf(@NonNull final ReadableMap options, final boolean forText) {
         mOpts = options;
 
-        int _fontStyle = "italic".equals(getString("fontStyle")) ? Typeface.ITALIC : Typeface.NORMAL;
-
-        final String _fontWeight = getString("fontWeight");
-        if (_fontWeight != null) {
-            switch (_fontWeight) {
-                case "bold":
-                case "900":
-                case "800":
-                case "700":
-                case "600":
-                case "500":
-                    _fontStyle |= Typeface.BOLD;
-                    break;
-            }
-        }
-
         allowFontScaling = forText && getBooleanOrTrue("allowFontScaling");
         fontFamily = getString("fontFamily");
         fontSize = getFontSizeOrDefault();
-        fontStyle = _fontStyle;
+        fontStyle = getFontStyle();
         includeFontPadding = forText && getBooleanOrTrue("includeFontPadding");
 
         // letterSpacing is supported in RN 0.55+
         letterSpacing = supportLetterSpacing() ? getFloatOrNaN("letterSpacing") : Float.NaN;
+    }
+
+    boolean has(@NonNull final String name) {
+        return mOpts.hasKey(name);
     }
 
     float getFloatOrNaN(@NonNull final String name) {
@@ -119,6 +107,25 @@ final class RNTextSizeConf {
             }
         }
         return DEF_FONTSIZE;
+    }
+
+    private int getFontStyle() {
+        int style = "italic".equals(getString("fontStyle")) ? Typeface.ITALIC : Typeface.NORMAL;
+
+        final String weight = getString("fontWeight");
+        if (weight != null) {
+            switch (weight) {
+                case "bold":
+                case "900":
+                case "800":
+                case "700":
+                case "600":
+                case "500":
+                    style |= Typeface.BOLD;
+                    break;
+            }
+        }
+        return style;
     }
 
     private boolean getBooleanOrTrue(@NonNull final String name) {
