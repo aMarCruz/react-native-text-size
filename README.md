@@ -7,7 +7,7 @@ Measure text accurately before laying it out and get font information from your 
 
 The text to be measured is required, the rest of the parameters supported are optional and work in the same way as with React Native:
 
-- Font family, Font file (Android), or Font face (iOS).
+- Font family, with the common name or specific filename for Android or font-name for iOS.
 - Font size
 - Font weight
 - Font style
@@ -80,9 +80,9 @@ $ react-native link react-native-text-size
       compile project(':react-native-text-size')
   	```
 
-## API Methods
+# API
 
-### `measure`
+## `measure`
 
 ```js
 measure(options: TSMeasureParams): Promise<TSMeasureResult>
@@ -114,12 +114,12 @@ The [example App](https://github.com/aMarCruz/react-native-text-size/tree/master
 
 **TSMeasureResult**
 
-Promise that resolves to a plain JS object with units in [Density Independent Pixels](https://developer.android.com/guide/topics/resources/more-resources#Dimension) (a.k.a DP or DIP), except for `lineCount`.
+`measure` returns a Promise that resolves to a plain JS object with units in [Density Independent Pixels](https://developer.android.com/guide/topics/resources/more-resources#Dimension) (a.k.a DP or DIP), except for `lineCount`.
 
 Property  | Type   | Notes
 --------- | ------ | ------
 width     | number | Total used width. It may be less or equal to the given width.
-height    | number | Total height, including top and bottom padding if `includingFontPadding` was given.
+height    | number | Total height, including top and bottom padding if `includingFontPadding` was set (the default).
 lastLineWidth | number | Width of the last line, without trailing blanks.
 lineCount | number | Number of lines, taking into account hard and automatic line breaks.
 
@@ -132,7 +132,7 @@ E_MISSING_TEXT | The text to measure is `null` or was not provided.
 E_INVALID_FONT_SPEC | The font specification is not valid. It is unlikely that this will happen on Android.
 E_UNKNOWN_ERROR | Well... who knows?
 
-#### _Example_
+### _Example_
 
 ```jsx
 //...
@@ -185,7 +185,7 @@ class Test extends Component<Props, State> {
 
 ---
 
-### `fontFromSpecs`
+## `fontFromSpecs`
 
 ```ts
 fontFromSpecs(specs: TSFontSpecs): Promise<TSFontInfo>
@@ -208,10 +208,9 @@ letterSpacing | number | 0
 
 <a name="tsfontinfo"></a> **TSFontInfo**
 
-JS object, ~~fully compatible with RN Text Style~~, with info for the given font and size, in [_sp_](https://developer.android.com/guide/topics/resources/more-resources#Dimension) in Android or points in iOS, and floating point numbers.
+JS object with info for the given font and size, units in [_SP_](https://developer.android.com/guide/topics/resources/more-resources#Dimension) in Android or points in iOS using floating point numbers.
 
-Using float numbers is more accurate\* than integers and allows you to use your preferred rounding method.
-Remember RN doesn't work with subpixels in Android and will truncate this values.
+Using floats is more accurate\* than integers and allows you to use your preferred rounding method, but remember RN doesn't work with subpixels in Android and will truncate this values.
 
 Property    | Type   | Details
 ----------- | ------ | --------
@@ -245,7 +244,7 @@ See more in:
 
 ---
 
-### `specsForTextStyles`
+## `specsForTextStyles`
 
 ```ts
 specsForTextStyles(): Promise<{ [key: string]: TSFontSpec }>
@@ -264,7 +263,7 @@ The resulting info is hard-coded in rnTextSize, the fontFamily is defined with t
 
 It will render the default 'Roboto' font and its variants, in non-rooted devices.
 
-The values follows the current Material Design guidelines:
+The key names and values follows the current Material Design guidelines:
 
 Key        | fontFamily    | fontSize | letterSpacing\*
 ---------- | ----------------- | ---- | --------------
@@ -306,7 +305,7 @@ title3      | `UIFontTextStyleTitle3`
 
 See more in [Typography](https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/), at the Human Interface Guidelines site.
 
-The format of the values is the same as in Android, a collection of this `TSFontForStyle` objects:
+The format of the values is the same as in Android, a collection of `TSFontForStyle` objects, fully compatible with the RN `<Text>` styles:
 
 **TSFontForStyle**
 
@@ -321,7 +320,7 @@ letterSpacing | number       | _Android only_. Omitted if running RN for lower t
 
 ---
 
-### `fontFamilyNames`
+## `fontFamilyNames`
 
 ```ts
 fontFamilyNames(): Promise<string[]>
@@ -411,7 +410,7 @@ If you are curious, se the `fonts.xml` or `system_fonts.xml` file in the ~/Andro
 
 ---
 
-### `fontNamesForFamilyName`
+## `fontNamesForFamilyName`
 
 ```ts
 fontNamesForFamilyName(fontFamily: string): Promise<string[]>
@@ -419,12 +418,12 @@ fontNamesForFamilyName(fontFamily: string): Promise<string[]>
 
 Wrapper for the `UIFont.fontNamesForFamilyName` method of UIKit, returns an array of font names available in a particular font family.
 
-You can use the `fontFamilyNames` function to get an array of the available font family names on the system.
+You can use the rnTextSize's `fontFamilyNames` function to get an array of the available font family names on the system.
 
 **iOS only**, on Android this function always resolves to `null`.
 
 
-## Custom Fonts
+### Custom Fonts on Android
 
 If you ask yourself why Android provides so few fonts in relation to iOS, ...me too.
 
