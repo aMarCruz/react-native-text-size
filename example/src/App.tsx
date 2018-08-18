@@ -49,6 +49,7 @@ const IOS = Platform.OS === 'ios' && Platform.Version || undefined
 const ANDROID = Platform.OS === 'android' && Platform.Version || undefined
 
 const winDims = Dimensions.get('window')
+const IS_SMALL = winDims.width <= 420
 const TEXT_TOP = 0
 const TEXT_LEFT = 14
 const TEXT_WIDTH = Math.min(274, winDims.width - TEXT_LEFT * 2)
@@ -181,7 +182,7 @@ export default class MeasureApp extends React.Component<Props, State> {
       cancelable: true,
       defaultValue: String(this.state.parms.width),
       placeholder: 'Width restriction or 0 for none',
-      type: 'numeric',
+      type: IOS ? 'default' : 'numeric',
     })
   }
 
@@ -249,7 +250,7 @@ export default class MeasureApp extends React.Component<Props, State> {
     return (
       <SafeAreaView style={styles.container}>
 
-        <TopAppBar title="TextSize Tester" />
+        <TopAppBar title="rnTextSize Tester" />
 
         <ScrollView style={styles.scrollArea}>
 
@@ -355,9 +356,9 @@ export default class MeasureApp extends React.Component<Props, State> {
           </View>
 
           <View style={styles.buttonBar}>
-            <Button outline text="Set Text" onPress={this.promptForText} />
-            <Button outline text="Set Width" onPress={this.promptForWidth} />
-            <Button outline text="Info..." onPress={this.showFontInfo} />
+            <Button outline={!IOS} text={IS_SMALL ? 'Text' : 'Set Text'} onPress={this.promptForText} />
+            <Button outline={!IOS} text={IS_SMALL ? 'Width' : 'Set Width'} onPress={this.promptForWidth} />
+            <Button outline={!IOS} text="Info..." onPress={this.showFontInfo} />
           </View>
 
           {/*

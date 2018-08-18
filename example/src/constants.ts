@@ -4,7 +4,7 @@ import TextSize from 'react-native-text-size'
 const iOS = Platform.OS === 'ios'
 
 // android
-export const primaryColor = iOS ? '0076FF' : '#3f51b5'
+export const primaryColor = iOS ? '#0076FF' : '#3f51b5'
 export const primaryDarkColor = '#364289'
 export const defaultFontSize = iOS ? 17 : 16
 //export const primaryDarkColor = '#002984'

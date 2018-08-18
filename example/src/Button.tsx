@@ -136,7 +136,7 @@ const styles = {
     justifyContent: 'center',
     height: 36,
     minHeight: 36,
-    minWidth: 64,
+    minWidth: 80,
     paddingHorizontal: 16,
     borderRadius: iOS ? 5 : 4,
   },

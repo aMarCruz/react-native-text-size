@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { primaryColor, fontSizeButton, TOPBAR_HEIGHT, titleColor } from './constants'
+import { primaryColor, fontSizePageTitle, TOPBAR_HEIGHT, titleColor, fontSizePrimaryText } from './constants'
 
 // typings
 import { TopAppBarAction, TopAppBarProps } from './TopAppBar'
@@ -23,13 +23,11 @@ class TopAppBar extends React.Component<Props> {
     const colorStyle = titleColor ? { color: titleColor } : undefined
 
     return (
-      <View style={styles.titleContainer}>
-        <Text
-          numberOfLines={1}
-          style={[styles.titleText, colorStyle]}>
-          {title}
-        </Text>
-      </View>
+      <Text
+        numberOfLines={1}
+        style={[styles.titleText, colorStyle]}>
+        {title}
+      </Text>
     )
   }
 
@@ -78,26 +76,21 @@ class TopAppBar extends React.Component<Props> {
 
 const styles = StyleSheet.create({
   navBarContainer: {
+    alignSelf: 'stretch',
+    paddingTop: 20,
+    height: 20 + TOPBAR_HEIGHT,
     backgroundColor: 'white',
   },
   navBar: {
-    height: TOPBAR_HEIGHT,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'stretch',
-  },
-  titleContainer: {
-    position: 'absolute',
-    left: 48,
-    right: 48,
-    top: 0,
-    bottom: 4,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    height: TOPBAR_HEIGHT,
+    maxHeight: TOPBAR_HEIGHT,
   },
   titleText: {
     color: titleColor,
-    fontSize: fontSizeButton,
+    fontSize: fontSizePageTitle,
     fontWeight: '600',
     letterSpacing: 0.41,
   },
@@ -107,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnText: {
-    fontSize: fontSizeButton,
+    fontSize: fontSizePrimaryText,
     letterSpacing: 0.5,
     color: primaryColor,
   },
