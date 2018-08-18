@@ -4,6 +4,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+### Changed
+- iOS: The `specsForTextStyles` function returns fontSize amd letterSpacing with unscaled values, to allow the use with `allowFontScaling`.
+
+### Fixed
+- iOS: Fixes to errors in the sample App that prevented if from running in iOS.
+
+## [2.0.0-beta.4] - 2018-08-17
+_Unpublished_
+
 **WARNING**
 
 _The package id has changed, you must uninstall the previous version before using this one._
