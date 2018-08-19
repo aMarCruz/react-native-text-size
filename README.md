@@ -100,7 +100,7 @@ Property   | Type   | Default  | Notes
 ---------- | ------ | -------- | ------
 text       | string | (none)   | This is the only required parameter and may include _emojis_ or be empty, but it can not be `null`. If this is an empty string the resulting `width` will be zero.
 width      | number | Infinity | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
-preciseWidth | boolean | false | If `true`, request an exact width calculation and the value of `lastWidth`. Only for Android, iOS always do this.
+usePreciseWidth | boolean | false | If `true`, request an exact width calculation and the value of `lastWidth`. Only for Android, iOS always do this.
 fontFamily | string | OS dependent | The default is the same applied by React Native.
 fontWeight | string | 'normal' | On android, numeric ranges has no granularity and '500' to '900' becomes 'bold', but you can use fonts of specific weights, like "sans-serif-medium".
 fontSize   | number | 14       | The default value is that used by RN and is provided in the `.FontSize.default` constant.
@@ -121,7 +121,7 @@ Property  | Type   | Notes
 --------- | ------ | ------
 width     | number | Total used width. It may be less or equal to the given width.
 height    | number | Total height, including top and bottom padding if `includingFontPadding` was set (the default).
-lastLineWidth | number | Width of the last line, without trailing blanks.<br>__Note: On Android, if `preciseWidth` is `false` (the default), this field is always zero.__
+lastLineWidth | number | Width of the last line, without trailing blanks.<br>__Note: On Android, if `usePreciseWidth` is `false` (the default), this field is always zero.__
 lineCount | number | Number of lines, taking into account hard and automatic line breaks.
 
 In case of error, the promise is rejected with an extended Error object with one of the following error codes, as literal strings:

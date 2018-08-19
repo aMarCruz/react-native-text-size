@@ -176,9 +176,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             float lastWidth = 0f; // also for lastLineWidth
 
             // go more faster?
-            if (conf.getBooleanOrTrue("preciseWidth")) {
-                rectWidth = layout.getWidth();
-            } else {
+            if (conf.getBooleanOrTrue("usePreciseWidth")) {
                 // Layout.getWidth() returns the configured max width, we must
                 // go slow to get the used one (and with the text trimmed).
                 rectWidth = 0f;
@@ -188,6 +186,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
                         rectWidth = lastWidth;
                     }
                 }
+            } else {
+                rectWidth = layout.getWidth();
             }
 
             result.putDouble("width", Math.min(rectWidth / density, width));

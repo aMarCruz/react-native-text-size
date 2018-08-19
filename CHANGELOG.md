@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ## [Unreleased]
 
 ### Added
-- Android: New flag `preciseWidth` (default `false`) request the most accurate calculation of the width and the value of `lastWidth`, but its is a bit slower.
+- Android: New flag `usePreciseWidth` (default `false`) request the most accurate calculation of the width and the value of `lastWidth`, but its is a bit slower.
 
 ### Changed
 - iOS: The `specsForTextStyles` function returns fontSize amd letterSpacing with unscaled values, to allow the use with `allowFontScaling`.

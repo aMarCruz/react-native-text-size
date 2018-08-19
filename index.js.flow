@@ -93,7 +93,7 @@ export type TSMeasureParams = TSFontSpecs & {
   /** @default true */
   allowFontScaling?: boolean,
   /** Request an exact width calculation. For Android, iOS always do this. */
-  preciseWidth?: boolean;
+  usePreciseWidth?: boolean;
 }
 
 export interface TSMeasureResult {
