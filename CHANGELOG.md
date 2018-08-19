@@ -7,8 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ### Changed
 - iOS: The `specsForTextStyles` function returns fontSize amd letterSpacing with unscaled values, to allow the use with `allowFontScaling`.
 
+### Removed
+- To avoid interfering with the change tracking of rnTextSize, this application was moved to its own repository.
+
 ### Fixed
 - iOS: Fixes to errors in the sample App that prevented if from running in iOS.
+
 
 ## [2.0.0-beta.4] - 2018-08-17
 _Unpublished_
