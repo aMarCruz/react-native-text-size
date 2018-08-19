@@ -20,6 +20,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.DisplayMetricsHolder;
 import com.facebook.react.uimanager.PixelUtil;
@@ -171,15 +172,21 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             }
 
             final int lineCount = layout.getLineCount();
-            float rectWidth = 0f;
+            float rectWidth;
             float lastWidth = 0f; // also for lastLineWidth
 
-            // Layout.getWidth() returns the configured max width, we must go slow
-            // to get the used one (and with the text trimmed).
-            for (int i = 0; i < lineCount; i++) {
-                lastWidth = layout.getLineMax(i);
-                if (lastWidth > rectWidth) {
-                    rectWidth = lastWidth;
+            // go more faster?
+            if (conf.getBooleanOrTrue("preciseWidth")) {
+                rectWidth = layout.getWidth();
+            } else {
+                // Layout.getWidth() returns the configured max width, we must
+                // go slow to get the used one (and with the text trimmed).
+                rectWidth = 0f;
+                for (int i = 0; i < lineCount; i++) {
+                    lastWidth = layout.getLineMax(i);
+                    if (lastWidth > rectWidth) {
+                        rectWidth = lastWidth;
+                    }
                 }
             }
 
@@ -280,31 +287,31 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void fontFamilyNames(final Promise promise) {
         final boolean lollipop = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-        final ArrayList<String> names = new ArrayList<>();
+        final WritableArray names = Arguments.createArray();
 
-        names.add("sans-serif");
-        names.add("sans-serif-condensed");
+        names.pushString("sans-serif");
+        names.pushString("sans-serif-condensed");
         if (lollipop) {
-            names.add("sans-serif-thin");
-            names.add("sans-serif-light");
-            names.add("sans-serif-medium");
-            names.add("sans-serif-black");
-            names.add("sans-serif-smallcaps");
-            names.add("sans-serif-condensed-light");
+            names.pushString("sans-serif-thin");
+            names.pushString("sans-serif-light");
+            names.pushString("sans-serif-medium");
+            names.pushString("sans-serif-black");
+            names.pushString("sans-serif-smallcaps");
+            names.pushString("sans-serif-condensed-light");
         } else {
             // SDK 16
-            names.add("sans-serif-light");
+            names.pushString("sans-serif-light");
         }
-        names.add("serif");
-        names.add("monospace");
+        names.pushString("serif");
+        names.pushString("monospace");
         if (lollipop) {
-            names.add("serif-monospace");
-            names.add("casual");
-            names.add("cursive");
+            names.pushString("serif-monospace");
+            names.pushString("casual");
+            names.pushString("cursive");
         }
 
         getFontsInAssets(names);
-        promise.resolve(Arguments.fromList(names));
+        promise.resolve(names);
     }
 
     /**
@@ -458,35 +465,38 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     private static final String[] FILE_EXTENSIONS = {".ttf", ".otf"};
     private static final String FONTS_ASSET_PATH = "fonts";
 
-    private ArrayList<String> fontsInAssets = null;
+    private String[] fontsInAssets = null;
 
     /**
      * Set the font names in assets/fonts into the target array.
-     * @param arr Target
+     * @param destArr Target
      */
-    private void getFontsInAssets(@NonNull List<String> arr) {
-        ArrayList<String> inArr = fontsInAssets;
+    private void getFontsInAssets(@NonNull WritableArray destArr) {
+        String[] srcArr = fontsInAssets;
 
-        if (inArr == null) {
+        if (srcArr == null) {
             final AssetManager assetManager = mReactContext.getAssets();
-            fontsInAssets = inArr = new ArrayList<>();
+            ArrayList<String> tmpArr = new ArrayList<>();
 
             if (assetManager != null) {
                 try {
                     String[] list = assetManager.list(FONTS_ASSET_PATH);
 
                     for (String spec : list) {
-                        addFamilyToArray(inArr, spec);
+                        addFamilyToArray(tmpArr, spec);
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
 
-            Collections.sort(arr, String.CASE_INSENSITIVE_ORDER);
+            Collections.sort(tmpArr, String.CASE_INSENSITIVE_ORDER);
+            fontsInAssets = srcArr = tmpArr.toArray(new String[0]);
         }
 
-        arr.addAll(inArr);
+        for (String name : srcArr) {
+            destArr.pushString(name);
+        }
     }
 
     private void addFamilyToArray(

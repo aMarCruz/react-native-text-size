@@ -96,19 +96,20 @@ If you provide the `width`, the measurement will apply the restriction and take 
 
 JS object with the text to measure, the maximum width, and properties like ones in the react-native [`<Text>`](https://facebook.github.io/react-native/docs/text) component.
 
-Property | Type    | Default  | Notes
--------- | ------- | -------- | ------
-text     | string  | (none)   | This is the only required parameter and may include _emojis_ or be empty, but it can not be `null`. If this is an empty string the resulting `width` will be zero.
-width    | number  | Infinity | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
+Property   | Type   | Default  | Notes
+---------- | ------ | -------- | ------
+text       | string | (none)   | This is the only required parameter and may include _emojis_ or be empty, but it can not be `null`. If this is an empty string the resulting `width` will be zero.
+width      | number | Infinity | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
+preciseWidth | boolean | false | If `true`, request an exact width calculation and the value of `lastWidth`. Only for Android, iOS always do this.
 fontFamily | string | OS dependent | The default is the same applied by React Native.
 fontWeight | string | 'normal' | On android, numeric ranges has no granularity and '500' to '900' becomes 'bold', but you can use fonts of specific weights, like "sans-serif-medium".
 fontSize   | number | 14       | The default value is that used by RN and is provided in the `.FontSize.default` constant.
 fontStyle  | string | 'normal' | One of "normal" or "italic".
-fontVariant        | array   | (none)        | _iOS only_
-allowFontScaling | boolean | true | To respect the user' setting of large fonts (i.e. use SP units).
-letterSpacing    | number  | (none) | Additional spacing between characters (a.k.a. `tracking`).<br>NOTE: In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+ and RN 0.55+_
-includeFontPadding | boolean | true | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
-textBreakStrategy  | string  | 'highQuality' | One of 'simple', 'balanced', or 'highQuality'.<br>_Android only, with API 23+_
+fontVariant         | array   | (none)        | _iOS only_
+allowFontScaling    | boolean | true | To respect the user' setting of large fonts (i.e. use SP units).
+letterSpacing       | number  | (none) | Additional spacing between characters (a.k.a. `tracking`).<br>NOTE: In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+ and RN 0.55+_
+includeFontPadding  | boolean | true | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
+textBreakStrategy   | string  | 'highQuality' | One of 'simple', 'balanced', or 'highQuality'.<br>_Android only, with API 23+_
 
 The [example App](https://github.com/aMarCruz/react-native-text-size/tree/master/example) shows interactively the effect of these parameters on the screen.
 
@@ -120,7 +121,7 @@ Property  | Type   | Notes
 --------- | ------ | ------
 width     | number | Total used width. It may be less or equal to the given width.
 height    | number | Total height, including top and bottom padding if `includingFontPadding` was set (the default).
-lastLineWidth | number | Width of the last line, without trailing blanks.
+lastLineWidth | number | Width of the last line, without trailing blanks.<br>__Note: On Android, if `preciseWidth` is `false` (the default), this field is always zero.__
 lineCount | number | Number of lines, taking into account hard and automatic line breaks.
 
 In case of error, the promise is rejected with an extended Error object with one of the following error codes, as literal strings:

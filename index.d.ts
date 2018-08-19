@@ -92,6 +92,8 @@ declare module "react-native-text-size" {
     width?: number;
     /** @default true */
     allowFontScaling?: boolean;
+    /** Request an exact width calculation. For Android, iOS always do this. */
+    preciseWidth?: boolean;
   }
 
   export type TSMeasureResult = {

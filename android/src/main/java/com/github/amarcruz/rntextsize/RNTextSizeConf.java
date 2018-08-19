@@ -128,7 +128,7 @@ final class RNTextSizeConf {
         return style;
     }
 
-    private boolean getBooleanOrTrue(@NonNull final String name) {
+    boolean getBooleanOrTrue(@NonNull final String name) {
         return !mOpts.hasKey(name) || mOpts.getBoolean(name);
     }
 }
