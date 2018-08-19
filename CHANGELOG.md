@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - To avoid interfering with the change tracking of rnTextSize, this application was moved to its own repository.
 
 ### Fixed
+- Android: `Arguments.fromList` does not exists in RN 0.52, replaced with `Arguments.fromArray`
 - iOS: Fixes to errors in the sample App that prevented if from running in iOS.
 
 
