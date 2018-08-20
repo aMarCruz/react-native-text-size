@@ -77,8 +77,10 @@ export type TSFontSpecs = {
 export type TSFontForStyle = {
   fontFamily: string | void,
   fontSize: number,
-  fontStyle: TSFontStyle,
-  fontWeight: TSFontWeight,
+  /** fontStyle is omitted if it is "normal" */
+  fontStyle?: TSFontStyle,
+  /** fontWeight is omitted if it is "normal" */
+  fontWeight?: TSFontWeight,
   /** @platform ios */
   fontVariant?: Array<TSFontVariant> | null,
   /** iOS all, Android SDK 21+ with RN 0.55+ */
@@ -99,7 +101,7 @@ export type TSMeasureParams = TSFontSpecs & {
 export interface TSMeasureResult {
   width: number;
   height: number;
-  lastLineWidth: number;
+  lastLineWidth?: number;
   lineCount: number;
 }
 

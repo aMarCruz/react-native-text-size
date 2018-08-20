@@ -173,10 +173,10 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
 
             final int lineCount = layout.getLineCount();
             float rectWidth;
-            float lastWidth = 0f; // also for lastLineWidth
 
             // go more faster?
             if (conf.getBooleanOrTrue("usePreciseWidth")) {
+                float lastWidth = 0f;
                 // Layout.getWidth() returns the configured max width, we must
                 // go slow to get the used one (and with the text trimmed).
                 rectWidth = 0f;
@@ -186,13 +186,13 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
                         rectWidth = lastWidth;
                     }
                 }
+                result.putDouble("lastLineWidth", lastWidth / density);
             } else {
                 rectWidth = layout.getWidth();
             }
 
             result.putDouble("width", Math.min(rectWidth / density, width));
             result.putDouble("height", layout.getHeight() / density);
-            result.putDouble("lastLineWidth", lastWidth / density);
             result.putInt("lineCount", lineCount);
 
             if (_DEBUG) {
@@ -416,9 +416,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         final WritableMap map = Arguments.createMap();
         final String roboto = "sans-serif";
 
+        // In Android, the fontFamily determines the weight
         map.putString("fontFamily", suffix != null ? (roboto + suffix) : roboto);
-        map.putString("fontStyle", "normal");
-        map.putString("fontWeight", "normal"); // the font determines the weight
         map.putInt("fontSize", fontSize);
 
         if (RNTextSizeConf.supportLetterSpacing()) {

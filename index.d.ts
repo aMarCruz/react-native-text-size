@@ -76,9 +76,12 @@ declare module "react-native-text-size" {
 
   export type TSFontForStyle = {
     fontFamily: string | void,
+    /** Unscaled font size, untits are SP in Android, points in iOS */
     fontSize: number,
-    fontStyle: TSFontStyle,
-    fontWeight: TSFontWeight,
+    /** fontStyle is omitted if it is "normal" */
+    fontStyle?: TSFontStyle,
+    /** fontWeight is omitted if it is "normal" */
+    fontWeight?: TSFontWeight,
     /** @platform ios */
     fontVariant?: Array<TSFontVariant> | null,
     /** iOS all, Android SDK 21+ with RN 0.55+ */
@@ -99,7 +102,7 @@ declare module "react-native-text-size" {
   export type TSMeasureResult = {
     width: number,
     height: number,
-    lastLineWidth: number,
+    lastLineWidth?: number,
     lineCount: number,
   }
 

@@ -141,30 +141,51 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
     size.width -= letterSpacing;
   }
 
-  const CGFloat epsilon = 1 / RCTScreenScale();
+  const CGFloat epsilon = 1 / RCTScreenScale(); // Yoga seems do this
   const CGFloat width = MIN(RCTCeilPixelValue(size.width + 0.001), maxSize.width);
   const CGFloat height = MIN(RCTCeilPixelValue(size.height + epsilon), maxSize.height);
+  const CGFloat lineCount = CGRound(size.height / (font.lineHeight + font.leading));
 
-  const CGFloat lastIndex = layoutManager.numberOfGlyphs - 1;
-  const CGSize lastSize = [layoutManager lineFragmentUsedRectForGlyphAtIndex:lastIndex
-                                                              effectiveRange:nil].size;
-  const CGFloat lastLineWidth = lastSize.width;
-  const CGFloat lineCount = CGRound(size.height / font.lineHeight);
+  CGFloat lastLineWidth = 0.0;
+  if ([options[@"usePreciseWidth"] boolValue]) {
+    const CGFloat lastIndex = layoutManager.numberOfGlyphs - 1;
+    const CGSize lastSize = [layoutManager lineFragmentUsedRectForGlyphAtIndex:lastIndex
+                                                                effectiveRange:nil].size;
+    lastLineWidth = lastSize.width;
+  }
 
   const NSDictionary *result = @{
                                  @"width": @(width),
                                  @"height": @(height),
-                                 @"lastLineWidth": @(lastLineWidth),
                                  @"lineCount": @(lineCount),
 #if _DEBUG
                                  @"_fontLineHeight": @(font.lineHeight),
                                  @"_rawWidth": @(size.width),
                                  @"_rawHeight": @(size.height),
                                  @"_leading": @(font.leading),
-                                 @"_descender": @(font.descender),
 #endif
                                  };
   resolve(result);
+}
+
+/**
+ * Resolve with an object with info about a font built with the parameters provided by
+ * the user. Rejects if the parameters are falsy or the font could not be created.
+ */
+RCT_EXPORT_METHOD(fontFromSpecs:(NSDictionary *)specs
+                       resolver:(RCTPromiseResolveBlock)resolve
+                       rejecter:(RCTPromiseRejectBlock)reject)
+{
+  if (isNull(specs)) {
+    reject(E_INVALID_FONT_SPEC, @"Missing font specification.", nil);
+  } else {
+    UIFont * _Nullable font = [RNTextSize UIFontFromUserSpecs:specs withBridge:_bridge];
+    if (font) {
+      resolve([RNTextSize fontInfoFromUIFont:font]);
+    } else {
+      reject(E_INVALID_FONT_SPEC, @"Invalid font specification.", nil);
+    }
+  }
 }
 
 /**
@@ -256,40 +277,20 @@ RCT_EXPORT_METHOD(specsForTextStyles:(RCTPromiseResolveBlock)resolve
                                   @(fontSize), @"fontSize",
                                   @(letterSpacing), @"letterSpacing",
                                   nil];
-    if (fontVariant) {
-      [value setValue:fontVariant forKey:@"fontVariant"];
+    if (![fontWeight isEqualToString:@"normal"]) {
+      [value setValue:fontWeight forKey:@"fontWeight"];
     }
     if (![fontStyle isEqualToString:@"normal"]) {
       [value setValue:fontStyle forKey:@"fontStyle"];
     }
-    if (![fontWeight isEqualToString:@"normal"]) {
-      [value setValue:fontWeight forKey:@"fontWeight"];
+    if (fontVariant) {
+      [value setValue:fontVariant forKey:@"fontVariant"];
     }
 
     [result setValue:value forKey:@(keys[ix])];
   }
 
   resolve(result);
-}
-
-/**
- * Resolve with an object with info about a font built with the parameters provided by
- * the user. Rejects if the parameters are falsy or the font could not be created.
- */
-RCT_EXPORT_METHOD(fontFromSpecs:(NSDictionary *)specs
-                       resolver:(RCTPromiseResolveBlock)resolve
-                       rejecter:(RCTPromiseRejectBlock)reject)
-{
-  if (isNull(specs)) {
-    reject(E_INVALID_FONT_SPEC, @"Missing font specification.", nil);
-  } else {
-    UIFont * _Nullable font = [RNTextSize UIFontFromUserSpecs:specs withBridge:_bridge];
-    if (font) {
-      resolve([RNTextSize fontInfoFromUIFont:font]);
-    } else {
-      reject(E_INVALID_FONT_SPEC, @"Invalid font specification.", nil);
-    }
-  }
 }
 
 /**
