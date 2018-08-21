@@ -1,6 +1,6 @@
 {
   "name": "react-native-text-size",
-  "version": "2.0.0-beta.5",
+  "version": "2.0.0-beta.6",
   "description": "Measure text accurately before laying it out and get font information from your App",
   "main": "index.js",
   "keywords": [
