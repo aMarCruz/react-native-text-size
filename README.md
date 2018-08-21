@@ -351,7 +351,7 @@ Nested `<Text>` components (or with images inside) can be rasterized with dimens
 
 I'm a full-stack developer with more than 20 year of experience and I try to share most of my work for free and help others, but this takes a significant amount of time and effort so, if you like my work, please consider...
 
-[![Buy Me a Coffee][bmc-image]](bmc-url)
+[![Buy Me a Coffee][bmc-image]][bmc-url]
 
 Feedback, PRs stars, and smiles are also welcome.
 
