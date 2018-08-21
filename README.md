@@ -27,7 +27,16 @@ The result includes:
 
 ...and it is practically identical to the one that React Native would send in the onLayout event using the same parameters.
 
-Additionally, the library includes functions for detailed information of the fonts visible to the App.
+In addition, the library includes functions to obtain information about the fonts visible to the App.
+
+rnTextSize is WIP, but if it has helped you, please support my work with a star or [buy me a coffee](https://www.buymeacoffee.com/aMarCruz).
+
+---
+**IMPORTANT:**
+
+**rnTextSize (react-native-text-size) v2.0 is a complete refactoring, before using it, please uninstall the previous version.**
+
+---
 
 **Requirements:**
 
@@ -37,18 +46,6 @@ Additionally, the library includes functions for detailed information of the fon
 The [sample App](https://github.com/aMarCruz/react-native-text-size/tree/master/example) uses RN v0.52.0, which is the minimum version supported by rnTextSize, but you can change it (See your README before testing it).
 
 To take advantage of features such as `letterSpacing`, and better support for the most modern devices, use RN v0.55 or above.
-
----
-**IMPORTANT:**
-
-_rnTextSize (react-native-text-size) v2.0 is a complete refactoring, before using it, please uninstall the previous version._
-
-This is WIP, I am working on the normalization and documentation of additional functions.
-
----
-
-If this library has helped you, please support my work with a star or [buy me a coffee](https://www.buymeacoffee.com/aMarCruz).
-
 
 ## Installation
 

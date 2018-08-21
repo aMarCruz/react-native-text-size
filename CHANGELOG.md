@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ## [Unreleased]
 
 ### Added
-- Android: New flag `usePreciseWidth` (default `false`) request the most accurate calculation of the width and the value of `lastWidth`, but its is a bit slower.
+- Revised REAME. Now it's clearer, part of its content  moved to the Wiki.
+- Docummented the iOS only properties `capHeight` and `xHeight` from the `fontFromSpecs` result.
+- New flag `usePreciseWidth` (default `false`) request the most accurate calculation of the width (Android) and the value of `lastWidth` (both), but its is a bit slower.
 
 ### Changed
 - iOS: The `specsForTextStyles` function returns fontSize amd letterSpacing with unscaled values, to allow the use with `allowFontScaling`.
