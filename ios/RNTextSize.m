@@ -68,10 +68,6 @@ RCT_EXPORT_MODULE();
   // iOS standard sizes
   NSDictionary *fontSize = @{
                              @"default": @(14),
-                             @"button": @([UIFont buttonFontSize]), // 18
-                             @"label": @([UIFont labelFontSize]),   // 17
-                             @"smallSystem": @([UIFont smallSystemFontSize]),   // 12
-                             @"system": @([UIFont systemFontSize]),   // 14
                              };
   return @{@"FontSize": fontSize};
 }
@@ -165,6 +161,72 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
                                  @"_leading": @(font.leading),
 #endif
                                  };
+  resolve(result);
+}
+
+/**
+ * Gets the width, height, line count and last line width for the provided text
+ * font specifications.
+ * Based on `RCTTextShadowViewMeasure` of Libraries/Text/Text/RCTTextShadowView.m
+ */
+RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  NSArray<NSString *> *const _Nullable texts = [RCTConvert NSStringArray:options[@"text"]];
+  if (isNull(texts)) {
+    reject(E_MISSING_TEXT, @"Missing required text, must be an array.", nil);
+    return;
+  }
+
+  UIFont *const _Nullable font = [RNTextSize UIFontFromUserSpecs:options withBridge:_bridge];
+  if (!font) {
+    reject(E_INVALID_FONT_SPEC, @"Invalid font specification.", nil);
+    return;
+  }
+
+  const CGFloat optWidth = CGFloatValueFrom(options[@"width"]);
+  const CGFloat maxWidth = isnan(optWidth) || isinf(optWidth) ? CGFLOAT_MAX : optWidth;
+  const CGSize maxSize = CGSizeMake(maxWidth, CGFLOAT_MAX);
+
+  // Create attributes for the font and the optional letter spacing.
+  const CGFloat letterSpacing = CGFloatValueFrom(options[@"letterSpacing"]);
+  NSDictionary<NSAttributedStringKey,id> *const attributes = isnan(letterSpacing)
+  ? @{NSFontAttributeName: font}
+  : @{NSFontAttributeName: font, NSKernAttributeName: @(letterSpacing)};
+
+  NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:maxSize];
+  textContainer.lineFragmentPadding = 0.0;
+  textContainer.lineBreakMode = NSLineBreakByClipping; // no maxlines support
+
+  NSLayoutManager *layoutManager = [NSLayoutManager new];
+  [layoutManager addTextContainer:textContainer];
+
+  NSMutableArray<NSNumber *> *result = [[NSMutableArray alloc] initWithCapacity:texts.count];
+  const CGFloat epsilon = 1 / RCTScreenScale(); // Yoga seems do this
+
+  for (int ix = 0; ix < texts.count; ix++) {
+    NSString *text = texts[ix];
+    if (!text) {
+      result[ix] = @0;
+      continue;
+    }
+    if (text == (id) kCFNull) {
+      result[ix] = @0;
+      continue;
+    }
+
+    NSTextStorage *textStorage = [[NSTextStorage alloc] initWithString:text attributes:attributes];
+    [textStorage addLayoutManager:layoutManager];
+
+    [layoutManager ensureLayoutForTextContainer:textContainer];
+    CGSize size = [layoutManager usedRectForTextContainer:textContainer].size;
+    [textStorage removeLayoutManager:layoutManager];
+
+    const CGFloat height = MIN(RCTCeilPixelValue(size.height + epsilon), maxSize.height);
+    result[ix] = @(height);
+  }
+
   resolve(result);
 }
 
