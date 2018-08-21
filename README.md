@@ -18,14 +18,16 @@ The text to be measured is required, the rest of the parameters supported are op
 - Allow font scaling
 - Maximum width, for automatic line-break based on text-break strategy.
 
-The result includes:
+There are two main functions, one to obtain the height of different blocks of text simultaneously, optimized for components such as `<FlatList>`.
+
+The other one gets detailed information about a block of text:
 
 - The width used by the text, with an option to calculate the real width of the largest line.
 - Height, with or without paddings.
 - The number of lines.
 - The width of the last line, if required, useful to save space with "See more..." style labels or time stamps.
 
-...and it is practically identical to the one that React Native would send in the onLayout event using the same parameters.
+Both, width and height, are practically the same as those received in the `onLayout` event of a `<Text>` component with the same properties.
 
 In addition, the library includes functions to obtain information about the fonts visible to the App.
 
@@ -180,7 +182,15 @@ Calculate the height of each of the strings in an array.
 
 This is an alternative to `measure` designed for cases in which you have to calculate the height of numerous text blocks with common characteristics (width, font, etc), a Typical case in the `<FlatList>`.
 
-The measurement uses the same algorithm as `measure`, but it returns only the height of each block and, by avoiding multiple steps through the bridge, it is much faster (in my tests, with 3500 random blocks of text, it took 778 ms, while mesure took 33,218).
+The measurement uses the same algorithm as `measure` but it returns only the height of each block and, by avoiding multiple steps through the bridge, it is faster... _much faster_ on Android!
+
+I did tests on 5,000 random text blocks and these were the results (ms):
+
+&nbsp;  | `measure` | `flatHeights`
+------- | --------: | ----------:
+Android | 49,624    | 1,091
+iOS     |  1,949    |   732
+
 
 In the future I will prepare an example of its use with FlatList and multiple styles on the same card.
 
