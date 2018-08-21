@@ -88,6 +88,15 @@ declare module "react-native-text-size" {
     letterSpacing?: number,
   }
 
+  export interface TSHeightsParams extends TSFontSpecs {
+    /** The required text to measure. */
+    text: string[];
+    /** Maximum width of the area to display the text. @default MAX_INT */
+    width?: number;
+    /** @default true */
+    allowFontScaling?: boolean;
+  }
+
   export interface TSMeasureParams extends TSFontSpecs {
     /** The required text to measure. */
     text: string;
@@ -110,6 +119,7 @@ declare module "react-native-text-size" {
     readonly FontSize: TSFontSize;
 
     measure(params: TSMeasureParams): Promise<TSMeasureResult>;
+    flatHeights(params: TSHeightsParams): Promise<number[]>;
     specsForTextStyles(): Promise<{ [key: string]: TSFontForStyle }>;
     fontFromSpecs(specs?: TSFontSpecs): Promise<TSFontInfo>;
     fontFamilyNames(): Promise<string[]>;

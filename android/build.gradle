@@ -69,3 +69,9 @@ task customClean(type: Delete) {
     delete rootProject.buildDir
 }
 clean.dependsOn customClean
+
+//gradle.projectsEvaluated {
+//    tasks.withType(JavaCompile) {
+//        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+//    }
+//}

@@ -87,6 +87,15 @@ export type TSFontForStyle = {
   letterSpacing?: number,
 }
 
+export type TSHeightsParams = TSFontSpecs & {
+  /** The required text to measure. */
+  text: string[],
+  /** Maximum width of the area to display the text. @default MAX_INT */
+  width?: number,
+  /** @default true */
+  allowFontScaling?: boolean,
+}
+
 export type TSMeasureParams = TSFontSpecs & {
   /** The required text to measure. */
   text: string,
@@ -109,6 +118,7 @@ declare interface TextSizeStatic {
   +FontSize: TSFontSize;
 
   measure(params: TSMeasureParams): Promise<TSMeasureResult>;
+  flatHeights(params: TSHeightsParams): Promise<number[]>;
   specsForTextStyles(): Promise<{ [string]: TSFontForStyle }>;
   fontFromSpecs(specs: TSFontSpecs): Promise<TSFontInfo>;
   fontFamilyNames(): Promise<string[]>;

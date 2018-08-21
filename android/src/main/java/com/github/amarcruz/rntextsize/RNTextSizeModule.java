@@ -2,29 +2,28 @@ package com.github.amarcruz.rntextsize;
 
 import android.content.res.AssetManager;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.BoringLayout;
 import android.text.Layout;
-import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.DisplayMetricsHolder;
-import com.facebook.react.uimanager.PixelUtil;
-import com.facebook.react.views.text.ReactFontManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,15 +32,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RNTextSizeModule extends ReactContextBaseJavaModule {
+class RNTextSizeModule extends ReactContextBaseJavaModule {
     private static final String TAG = "RNTextSize";
-    private static final boolean _DEBUG = true;
     private static final float SPACING_ADDITION = 0f;
     private static final float SPACING_MULTIPLIER = 1f;
 
     private static final String E_MISSING_TEXT = "E_MISSING_TEXT";
     private static final String E_MISSING_PARAMETER = "E_MISSING_PARAMETER";
-    private static final String E_INVALID_FONT_SPEC = "E_INVALID_FONT_SPEC";
     private static final String E_UNKNOWN_ERROR = "E_UNKNOWN_ERROR";
 
     // It's important to pass the ANTI_ALIAS_FLAG flag to the constructor rather than setting it
@@ -49,7 +46,7 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     // The bug is that unicode emoticons aren't measured properly which causes text to be clipped.
     private static final TextPaint sTextPaintInstance = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
 
-    private ReactApplicationContext mReactContext;
+    private final ReactApplicationContext mReactContext;
 
     RNTextSizeModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -67,11 +64,6 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         final Map<String, Object> fontSizes = new HashMap<>();
 
         fontSizes.put("default", RNTextSizeConf.getDefaultFontSize());
-        fontSizes.put("button", 14.0f);
-        fontSizes.put("label", 16.0f);
-        fontSizes.put("smallSystem", 12.0f);
-        fontSizes.put("system", 14.0f);
-
         constants.put("FontSize", fontSizes);
         return constants;
     }
@@ -94,9 +86,10 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         }
 
         final float density = getCurrentDensity();
+        final float width = conf.getWidth(density);
         final boolean includeFontPadding = conf.includeFontPadding;
-        final WritableMap result = Arguments.createMap();
 
+        final WritableMap result = Arguments.createMap();
         if (_text.isEmpty()) {
             // RN 0.56 consistently sets the height at 14dp divided by the density
             // plus 1 if includeFontPadding when text is empty, so we do the same.
@@ -109,17 +102,10 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        final Spannable text = RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, _text);
+        final SpannableString text = (SpannableString) RNTextSizeSpannedText
+                .spannedFromSpecsAndText(mReactContext, conf, new SpannableString(_text));
+
         final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-
-        // No width or width <= 0 becomes an unconstrained width
-        float width = conf.getFloatOrNaN("width");
-        if (!Float.isNaN(width) && width > 0) {
-            width = width * density;                // always DIP
-        } else {
-            width = Float.MAX_VALUE;
-        }
-
         Layout layout = null;
         try {
             final BoringLayout.Metrics boring = BoringLayout.isBoring(text, textPaint);
@@ -145,15 +131,10 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             }
 
             if (layout == null) {
-                Log.d(TAG,"Creating non-boring layout of width: " + hintWidth);
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    final int textBreakStrategy = conf.getTextBreakStrategy();
-                    Log.d(TAG, "Using textBreakStrategy = " + textBreakStrategy);
-
                     layout = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
                             .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-                            .setBreakStrategy(textBreakStrategy)
+                            .setBreakStrategy(conf.getTextBreakStrategy())
                             .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
                             .setIncludePad(includeFontPadding)
                             .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
@@ -195,11 +176,6 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
             result.putDouble("height", layout.getHeight() / density);
             result.putInt("lineCount", lineCount);
 
-            if (_DEBUG) {
-                result.putInt("_topPadding", layout.getTopPadding());
-                result.putInt("_bottomPadding", layout.getBottomPadding());
-                result.putDouble("_rectWidth", rectWidth);
-            }
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject(E_UNKNOWN_ERROR, e);
@@ -209,28 +185,78 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     // https://stackoverflow.com/questions/3654321/measuring-text-height-to-be-drawn-on-canvas-android
     @SuppressWarnings("unused")
     @ReactMethod
-    public void getTextBounds(@Nullable final ReadableMap specs, final Promise promise) {
+    public void flatHeights(@Nullable final ReadableMap specs, final Promise promise) {
         final RNTextSizeConf conf = getConf(specs, promise, true);
         if (conf == null) {
             return;
         }
-        final String text = conf.getString("text");
-        if (text == null) {
-            promise.reject(E_MISSING_TEXT, "Missing required text.");
+
+        final ReadableArray texts = conf.getArray("text");
+        if (texts == null) {
+            promise.reject(E_MISSING_TEXT, "Missing required text, must be an array.");
             return;
         }
-        final TextPaint textPaint = sTextPaintInstance;
-        final Rect bounds = new Rect();
-
-        resetPaintWithFont(textPaint, conf);
-        textPaint.getTextBounds(text, 0, text.length(), bounds);
 
         final float density = getCurrentDensity();
-        final WritableMap result = Arguments.createMap();
-        result.putDouble("width", bounds.width() / density);
-        result.putDouble("height", bounds.height() / density);
+        final float width = conf.getWidth(density);
+        final boolean includeFontPadding = conf.includeFontPadding;
+        final int textBreakStrategy = conf.getTextBreakStrategy();
+
+        final WritableArray result = Arguments.createArray();
+
+        final SpannableStringBuilder sb = new SpannableStringBuilder(" ");
+        RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
+
+        final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+        double minHeight = Double.NaN;
+        Layout layout;
+        try {
+
+            for (int ix = 0; ix < texts.size(); ix++) {
+
+                if (texts.getType(ix) != ReadableType.String) {
+                    result.pushInt(0);
+                    continue;
+                }
+
+                final String text = texts.getString(ix);
+                if (text.isEmpty()) {
+                    if (Double.isNaN(minHeight)) {
+                        minHeight = (14.0f / density) + (includeFontPadding ? 1 : 0);
+                    }
+                    result.pushDouble(minHeight);
+                    continue;
+                }
+
+                sb.replace(0, sb.length(), text);
+
+                if (Build.VERSION.SDK_INT >= 23) {
+                    layout = StaticLayout.Builder.obtain(sb, 0, sb.length(), textPaint, (int) width)
+                            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                            .setBreakStrategy(textBreakStrategy)
+                            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
+                            .setIncludePad(includeFontPadding)
+                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
+                            .build();
+                } else {
+                    layout = new StaticLayout(
+                            sb,
+                            textPaint,
+                            (int) width,
+                            Layout.Alignment.ALIGN_NORMAL,
+                            SPACING_MULTIPLIER,
+                            SPACING_ADDITION,
+                            includeFontPadding
+                    );
+                }
+
+                result.pushDouble(layout.getHeight() / density);
+            }
 
         promise.resolve(result);
+        } catch (Exception e) {
+            promise.reject(E_UNKNOWN_ERROR, e);
+        }
     }
 
     /**
@@ -273,14 +299,15 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
         if (conf == null) {
             return;
         }
+        final Typeface typeface = RNTextSizeConf.getFont(mReactContext, conf.fontFamily, conf.fontStyle);
         final TextPaint textPaint = sTextPaintInstance;
-        final Typeface typeface = resetPaintWithFont(textPaint, conf);
+        final int fontSize = (int) Math.ceil(conf.scale(conf.fontSize));
 
-        if (typeface != null) {
-            promise.resolve(fontInfoFromTypeface(textPaint, typeface, conf));
-        } else {
-            promise.reject(E_INVALID_FONT_SPEC, "Invalid font specification.");
-        }
+        textPaint.reset();
+        textPaint.setTypeface(typeface);
+        textPaint.setTextSize(fontSize);
+
+        promise.resolve(fontInfoFromTypeface(textPaint, typeface, conf));
     }
 
     @SuppressWarnings("unused")
@@ -345,67 +372,6 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * Make a Typeface from the supplied specification.
-     * @param conf Font specification.
-     */
-    @NonNull
-    private Typeface createTypefaceFromConf(
-            @NonNull final RNTextSizeConf conf
-    ) {
-        final String fontFamily = conf.fontFamily;
-        final int style = conf.fontStyle;
-        Typeface typeface;
-
-        // Unfortunately, RN will return a valid font Typeface (usually Roboto) even if the font is
-        // not installed or has type error in its name. In any case we check if it is null.
-        if (fontFamily != null) {
-            final AssetManager assetManager = mReactContext.getAssets();
-            typeface = ReactFontManager.getInstance().getTypeface(fontFamily, style, assetManager);
-        } else {
-            typeface = null;
-        }
-
-        return typeface != null ? typeface : Typeface.defaultFromStyle(style);
-    }
-
-    /**
-     * Reinitialize the TextPaint object with the required font.
-     * @param conf Font specification.
-     * @return The typeface used to draw in the TextPaint, null if error.
-     */
-    private Typeface resetPaintWithFont(
-            @NonNull final TextPaint paint,
-            @NonNull final RNTextSizeConf conf,
-            @NonNull Typeface typeface
-    ) {
-        paint.reset();
-        paint.setTypeface(typeface);
-
-        final int fontSize = (int) Math.ceil(conf.allowFontScaling
-                ? PixelUtil.toPixelFromSP(conf.fontSize)
-                : PixelUtil.toPixelFromDIP(conf.fontSize));
-        paint.setTextSize(fontSize);
-        Log.d(TAG, "paint -> fontSize " + conf.fontSize +
-                ", textSize(): " + paint.getTextSize() + ", allowFontScaling " + conf.allowFontScaling);
-
-        // No need to reset letterSpacing after paint.reset()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (!Float.isNaN(conf.letterSpacing)) {
-                final float letterSpacing = conf.allowFontScaling
-                        ? PixelUtil.toPixelFromSP(conf.letterSpacing)
-                        : PixelUtil.toPixelFromDIP(conf.letterSpacing);
-                paint.setLetterSpacing(letterSpacing / paint.getTextSize());
-            }
-        }
-
-        return typeface;
-    }
-
-    private Typeface resetPaintWithFont(@NonNull final TextPaint paint, @NonNull final RNTextSizeConf conf) {
-        return resetPaintWithFont(paint, conf, createTypefaceFromConf(conf));
-    }
-
-    /**
      * This is for 'fontFromFontStyle', makes the minimal info required.
      * @param suffix The font variant
      * @param fontSize Font size in SP
@@ -456,8 +422,8 @@ public class RNTextSizeModule extends ReactContextBaseJavaModule {
     /**
      * Retuns the current density.
      */
+    @SuppressWarnings("deprecation")
     private float getCurrentDensity() {
-        //noinspection deprecation
         return DisplayMetricsHolder.getWindowDisplayMetrics().density;
     }
 

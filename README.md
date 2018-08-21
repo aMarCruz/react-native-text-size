@@ -72,6 +72,10 @@ This function measures the text like RN does when the text does not have embedde
 
 If you provide the `width`, the measurement will apply the restriction and take into account the automatic line breaks, in addition to the explicit ones.
 
+**NOTE:**
+
+Although this function is accurate and provides complete information, it can be heavy if the text is a lot, like the one that can be displayed in a FlatList. For these cases, it is better to use `flatHeights` which is much faster.
+
 <a name="tsmeasureparams"></a>**TSMeasureParams**
 
 JS object with the text to measure, the maximum width, and properties like ones in the react-native [`<Text>`](https://facebook.github.io/react-native/docs/text) component.
@@ -163,6 +167,46 @@ class Test extends Component<Props, State> {
   }
 }
 ```
+
+---
+
+## `flatHeights`
+
+```ts
+flatHeights(options: TSHeightsParams): Promise<number[]>
+```
+
+Calculate the height of each of the strings in an array.
+
+This is an alternative to `measure` designed for cases in which you have to calculate the height of numerous text blocks with common characteristics (width, font, etc), a Typical case in the `<FlatList>`.
+
+The measurement uses the same algorithm as `measure`, but it returns only the height of each block and, by avoiding multiple steps through the bridge, it is much faster (in my tests, with 3500 random blocks of text, it took 778 ms, while mesure took 33,218).
+
+In the future I will prepare an example of its use with FlatList and multiple styles on the same card.
+
+**TSHeightsParams**
+
+This is an object similar to the one received by measure, with the difference that the text property is an array of strings, and the usePreciseWidth property is ignored.
+
+The result is an array with the height of each block, in the same order was given.
+
+This is an object similar to the one received by `measure`, but the `text` property is an array of strings and the `usePreciseWidth` property is ignored.
+
+Property   | Type   | Default
+---------- | ------ | --------
+text       | string | (none)
+width      | number | Infinity
+fontFamily | string | OS dependent
+fontWeight | string | 'normal'
+fontSize   | number | 14
+fontStyle  | string | 'normal'
+fontVariant         | array   | (none)
+allowFontScaling    | boolean | true
+letterSpacing       | number  | (none)
+includeFontPadding  | boolean | true
+textBreakStrategy   | string  | 'highQuality'
+
+The result is a Promise that resolves to an array with the height of each block (_SP_), in the same order in which they were received.
 
 ---
 

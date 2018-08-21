@@ -1,14 +1,19 @@
 package com.github.amarcruz.rntextsize;
 
-import android.annotation.TargetApi;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Layout;
+import android.util.Log;
 
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.modules.systeminfo.ReactNativeVersion;
+import com.facebook.react.bridge.ReadableType;
+import com.facebook.react.uimanager.PixelUtil;
+import com.facebook.react.views.text.ReactFontManager;
 
 import java.util.Map;
 
@@ -19,11 +24,30 @@ final class RNTextSizeConf {
     static {
         int version = 0;
         try {
-            Map<String, Object> rnv = ReactNativeVersion.VERSION;
+            Class.forName("com.facebook.react.modules.systeminfo.ReactNativeVersion");
+            Map<String, Object> rnv = com.facebook.react.modules.systeminfo.ReactNativeVersion.VERSION;
             version = ((int) rnv.get("major") << 16) | (int) rnv.get("minor");
-        } catch (Exception ignore) {
+        } catch (Exception ex) {
+            Log.v("RNTextSize", "Cannot get RN version.", ex);
         }
         reactNativeVersion = version;
+    }
+
+
+    /**
+     * Make a Typeface from the supplied font family and style.
+     */
+    @NonNull
+    static Typeface getFont(
+            @NonNull final ReactApplicationContext context,
+            @Nullable String family,
+            final int style
+    ) {
+        final Typeface typeface = family != null
+                ? ReactFontManager.getInstance().getTypeface(family, style, context.getAssets())
+                : null;
+
+        return typeface != null ? typeface : Typeface.defaultFromStyle(style);
     }
 
     // letterSpacing is supported in RN 0.55+
@@ -36,11 +60,11 @@ final class RNTextSizeConf {
     }
 
     private final ReadableMap mOpts;
+    private final boolean allowFontScaling;
 
     final String fontFamily;
     final float fontSize;
     final int fontStyle;
-    final boolean allowFontScaling;
     final boolean includeFontPadding;
     final float letterSpacing;
 
@@ -68,8 +92,8 @@ final class RNTextSizeConf {
         return mOpts.hasKey(name);
     }
 
-    float getFloatOrNaN(@NonNull final String name) {
-        return mOpts.hasKey(name) ? (float) mOpts.getDouble(name) : Float.NaN;
+    boolean getBooleanOrTrue(@NonNull final String name) {
+        return !mOpts.hasKey(name) || mOpts.getBoolean(name);
     }
 
     @Nullable
@@ -78,8 +102,33 @@ final class RNTextSizeConf {
                 ? mOpts.getString(name) : null;
     }
 
-    @TargetApi(23)
+    @SuppressWarnings("SameParameterValue")
+    @Nullable
+    ReadableArray getArray(@NonNull final String name) {
+        return mOpts.hasKey(name) && mOpts.getType(name) == ReadableType.Array
+                ? mOpts.getArray(name) : null;
+    }
+
+    float scale(final float measure) {
+        return allowFontScaling
+                ? PixelUtil.toPixelFromSP(measure)
+                : PixelUtil.toPixelFromDIP(measure);
+    }
+
+    float getWidth(final float density) {
+        float width = getFloatOrNaN("width");
+        if (!Float.isNaN(width) && width > 0) {
+            return width * density;                // always DIP
+        } else {
+            return Float.MAX_VALUE;
+        }
+    }
+
     int getTextBreakStrategy() {
+        if (Build.VERSION.SDK_INT < 23) {
+            return 0;
+        }
+
         final String textBreakStrategy = getString("textBreakStrategy");
 
         if (textBreakStrategy != null) {
@@ -96,6 +145,10 @@ final class RNTextSizeConf {
             }
         }
         return Layout.BREAK_STRATEGY_HIGH_QUALITY;
+    }
+
+    private float getFloatOrNaN(@NonNull final String name) {
+        return mOpts.hasKey(name) ? (float) mOpts.getDouble(name) : Float.NaN;
     }
 
     private float getFontSizeOrDefault() {
@@ -126,9 +179,5 @@ final class RNTextSizeConf {
             }
         }
         return style;
-    }
-
-    boolean getBooleanOrTrue(@NonNull final String name) {
-        return !mOpts.hasKey(name) || mOpts.getBoolean(name);
     }
 }

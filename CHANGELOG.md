@@ -4,7 +4,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+## [2.0.0-beta.5] - 2018-08-21
+
 ### Added
+- New function `flatHeights` to calculate the height of multiple strings at once, much faster than` measure`.
 - Revised REAME. Now it's clearer, part of its content  moved to the Wiki.
 - Docummented the iOS only properties `capHeight` and `xHeight` from the `fontFromSpecs` result.
 - New flag `usePreciseWidth` (default `false`) request the most accurate calculation of the width (Android) and the value of `lastWidth` (both), but its is a bit slower.
