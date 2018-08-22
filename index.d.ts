@@ -116,8 +116,6 @@ declare module "react-native-text-size" {
   }
 
   interface TextSizeStatic {
-    readonly FontSize: TSFontSize;
-
     measure(params: TSMeasureParams): Promise<TSMeasureResult>;
     flatHeights(params: TSHeightsParams): Promise<number[]>;
     specsForTextStyles(): Promise<{ [key: string]: TSFontForStyle }>;

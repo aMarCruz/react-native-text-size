@@ -115,8 +115,6 @@ export interface TSMeasureResult {
 }
 
 declare interface TextSizeStatic {
-  +FontSize: TSFontSize;
-
   measure(params: TSMeasureParams): Promise<TSMeasureResult>;
   flatHeights(params: TSHeightsParams): Promise<number[]>;
   specsForTextStyles(): Promise<{ [string]: TSFontForStyle }>;

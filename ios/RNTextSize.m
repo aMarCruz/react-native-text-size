@@ -1,3 +1,5 @@
+#import "RNTextSize.h"
+
 #if __has_include(<React/RCTConvert.h>)
 #import <React/RCTConvert.h>
 #import <React/RCTFont.h>
@@ -11,9 +13,6 @@
 #endif
 
 #import <CoreText/CoreText.h>
-#import "RNTextSize.h"
-
-#define _DEBUG 1
 
 static NSString *const E_MISSING_TEXT = @"E_MISSING_TEXT";
 static NSString *const E_INVALID_FONT_SPEC = @"E_INVALID_FONT_SPEC";
@@ -59,19 +58,6 @@ RCT_EXPORT_MODULE();
   return dispatch_get_main_queue();
 }
 
-/*
-  Is RN exposing its default font size? Try to get a UIFont here warnings
-  "Required dispatch_sync to load constants ...This may lead to deadlocks"
-  as in https://github.com/facebook/react-native/issues/16376
- */
-- (NSDictionary *)constantsToExport {
-  // iOS standard sizes
-  NSDictionary *fontSize = @{
-                             @"default": @(14),
-                             };
-  return @{@"FontSize": fontSize};
-}
-
 /**
  * Gets the width, height, line count and last line width for the provided text
  * font specifications.
@@ -93,7 +79,7 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
   if (!text.length) {
     resolve(@{
               @"width": @0,
-              @"height": @0,
+              @"height": @14,
               @"lastLineWidth": @0,
               @"lineCount": @0,
               });
@@ -102,8 +88,7 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
 
   // We cann't use RCTConvert since it does not handle font scaling and RN
   // does not scale the font if a custom delegate has been defined to create.
-  //UIFont * _Nullable font = [RCTConvert UIFont:options];
-  UIFont *const _Nullable font = [RNTextSize UIFontFromUserSpecs:options withBridge:_bridge];
+  UIFont *const _Nullable font = [self scaledUIFontFromUserSpecs:options];
   if (!font) {
     reject(E_INVALID_FONT_SPEC, @"Invalid font specification.", nil);
     return;
@@ -137,31 +122,28 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
     size.width -= letterSpacing;
   }
 
-  const CGFloat epsilon = 1 / RCTScreenScale(); // Yoga seems do this
-  const CGFloat width = MIN(RCTCeilPixelValue(size.width + 0.001), maxSize.width);
+  const CGFloat epsilon = 0.001;
+  const CGFloat width = MIN(RCTCeilPixelValue(size.width + epsilon), maxSize.width);
   const CGFloat height = MIN(RCTCeilPixelValue(size.height + epsilon), maxSize.height);
   const CGFloat lineCount = CGRound(size.height / (font.lineHeight + font.leading));
 
-  CGFloat lastLineWidth = 0.0;
   if ([options[@"usePreciseWidth"] boolValue]) {
     const CGFloat lastIndex = layoutManager.numberOfGlyphs - 1;
     const CGSize lastSize = [layoutManager lineFragmentUsedRectForGlyphAtIndex:lastIndex
                                                                 effectiveRange:nil].size;
-    lastLineWidth = lastSize.width;
+    resolve(@{
+              @"width": @(width),
+              @"height": @(height),
+              @"lastLineWidth": @(lastSize.width),
+              @"lineCount": @(lineCount),
+              });
+  } else {
+    resolve(@{
+              @"width": @(width),
+              @"height": @(height),
+              @"lineCount": @(lineCount),
+              });
   }
-
-  const NSDictionary *result = @{
-                                 @"width": @(width),
-                                 @"height": @(height),
-                                 @"lineCount": @(lineCount),
-#if _DEBUG
-                                 @"_fontLineHeight": @(font.lineHeight),
-                                 @"_rawWidth": @(size.width),
-                                 @"_rawHeight": @(size.height),
-                                 @"_leading": @(font.leading),
-#endif
-                                 };
-  resolve(result);
 }
 
 /**
@@ -173,13 +155,14 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-  NSArray<NSString *> *const _Nullable texts = [RCTConvert NSStringArray:options[@"text"]];
+  // Don't use NSStringArray, we are handling nulls
+  NSArray *const _Nullable texts = [RCTConvert NSArray:options[@"text"]];
   if (isNull(texts)) {
     reject(E_MISSING_TEXT, @"Missing required text, must be an array.", nil);
     return;
   }
 
-  UIFont *const _Nullable font = [RNTextSize UIFontFromUserSpecs:options withBridge:_bridge];
+  UIFont *const _Nullable font = [self scaledUIFontFromUserSpecs:options];
   if (!font) {
     reject(E_INVALID_FONT_SPEC, @"Invalid font specification.", nil);
     return;
@@ -203,7 +186,7 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
   [layoutManager addTextContainer:textContainer];
 
   NSMutableArray<NSNumber *> *result = [[NSMutableArray alloc] initWithCapacity:texts.count];
-  const CGFloat epsilon = 1 / RCTScreenScale(); // Yoga seems do this
+  const CGFloat epsilon = 0.001;
 
   for (int ix = 0; ix < texts.count; ix++) {
     NSString *text = texts[ix];
@@ -212,7 +195,7 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
       continue;
     }
     if (text == (id) kCFNull) {
-      result[ix] = @0;
+      result[ix] = @14;
       continue;
     }
 
@@ -235,15 +218,15 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
  * the user. Rejects if the parameters are falsy or the font could not be created.
  */
 RCT_EXPORT_METHOD(fontFromSpecs:(NSDictionary *)specs
-                       resolver:(RCTPromiseResolveBlock)resolve
-                       rejecter:(RCTPromiseRejectBlock)reject)
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
   if (isNull(specs)) {
     reject(E_INVALID_FONT_SPEC, @"Missing font specification.", nil);
   } else {
-    UIFont * _Nullable font = [RNTextSize UIFontFromUserSpecs:specs withBridge:_bridge];
+    UIFont * _Nullable font = [self UIFontFromUserSpecs:specs withScale:1.0];
     if (font) {
-      resolve([RNTextSize fontInfoFromUIFont:font]);
+      resolve([self fontInfoFromUIFont:font]);
     } else {
       reject(E_INVALID_FONT_SPEC, @"Invalid font specification.", nil);
     }
@@ -251,32 +234,25 @@ RCT_EXPORT_METHOD(fontFromSpecs:(NSDictionary *)specs
 }
 
 /**
- * Resolves with an array of font info from the predefined iOS Text Styles.
+ * Resolves with an array of font info for the predefined iOS Text Styles.
+ * The returned size is "Large", the default following the iOS HIG.
  *
- * NOTE:  The info includes unscaled font size and letterSpacing because this is
- *        managed by the RN `allowFontScaling` property.
- *        The returned size is "Large" (body of 17pt) following the iOS HIG.
+ * NOTE:  The info includes unscaled fontSize and letterSpacing. fontSize is managed by
+ *        by RN `allowFontScaling`, but letterSpacing is not.
  *
  * Altough the technique used to get create the result is complicated to maintain,
  * it simplifies things a lot.
- *
- * @see https://devsign.co/notes/tracking-and-character-spacing
- * @see https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/
- * @see https://useyourloaf.com/blog/auto-adjusting-fonts-for-dynamic-type/
  */
 RCT_EXPORT_METHOD(specsForTextStyles:(RCTPromiseResolveBlock)resolve
-                            rejecter:(RCTPromiseRejectBlock)reject)
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
+  // From https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography/
   // These are the predefined kerning (1/1000em) to convert into letterSpacing (points)
   static const int T_OFFSET = 10;  // tracking start with fontSize 10
   static const char trackings[] = {
     12, 6, 0, -6, -11, -16, -20, -24, -25, -26,
     19, 17, 16, 16, 15, 14, 14, 13, 13, 13,
-    12, 12, 12, 11, 11, 11, 11, 11, 11, 11,
-    10, 10, 10, 10, 9, 9, 9, 9, 8, 8,
-    7, 7, 7, 6, 6, 6, 5, 5, 5, 5,
-    4, 4, 4, 4, 4, 3, 3, 3, 3, 2,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    12, 12, 12, 11, 11,
   };
   // These are the names of the properties to return
   static char *keys[] = {
@@ -311,7 +287,7 @@ RCT_EXPORT_METHOD(specsForTextStyles:(RCTPromiseResolveBlock)resolve
     UIFontTextStyleBody, UIFontTextStyleCallout, UIFontTextStyleSubheadline,
     UIFontTextStyleFootnote, UIFontTextStyleCaption1, UIFontTextStyleCaption2,
     textStyleLargeTitle,
-  ];
+    ];
 
   // ...and with all in place, we are ready to create our result
   NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:[textStyles count]];
@@ -324,9 +300,9 @@ RCT_EXPORT_METHOD(specsForTextStyles:(RCTPromiseResolveBlock)resolve
     const NSDictionary *traits = [descriptor objectForKey:UIFontDescriptorTraitsAttribute];
 
     const NSString *fontFamily = font.familyName ?: font.fontName ?: (id) [NSNull null];
-    const NSArray *fontVariant = [RNTextSize fontVariantFromDescriptor:descriptor];
-    const NSString *fontStyle  = [RNTextSize fontStyleFromTraits:traits];
-    const NSString *fontWeight = [RNTextSize fontWeightFromTraits:traits];
+    const NSArray *fontVariant = [self fontVariantFromDescriptor:descriptor];
+    const NSString *fontStyle  = [self fontStyleFromTraits:traits];
+    const NSString *fontWeight = [self fontWeightFromTraits:traits];
 
     // The standard font size for this style is also used to calculate letterSpacing
     const int fontSize = sizes[ix];
@@ -359,7 +335,7 @@ RCT_EXPORT_METHOD(specsForTextStyles:(RCTPromiseResolveBlock)resolve
  * Resolve with an array of font family names available on the system.
  */
 RCT_EXPORT_METHOD(fontFamilyNames:(RCTPromiseResolveBlock)resolve
-                         rejecter:(RCTPromiseRejectBlock)reject)
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
   NSArray<NSString *> *fonts = [UIFont.familyNames
                                 sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
@@ -371,8 +347,8 @@ RCT_EXPORT_METHOD(fontFamilyNames:(RCTPromiseResolveBlock)resolve
  * Reject if the name is falsy or the names could not be obtain.
  */
 RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
-                                resolver:(RCTPromiseResolveBlock)resolve
-                                rejecter:(RCTPromiseRejectBlock)reject)
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
   if (isNull(fontFamily)) {
     reject(E_INVALID_FONTFAMILY, @"Missing fontFamily name.", nil);
@@ -393,20 +369,28 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 //
 
 /**
- * Create a font based on the given specs.
+ * Create a scaled font based on the given specs.
  *
- * TODO: implement the following behavior:
+ * TODO:
  * This method is used instead of [RCTConvert UIFont] to support the omission
  * of scaling when a custom delegate has been defined for font's creation.
  */
-+ (UIFont * _Nullable)UIFontFromUserSpecs:(const NSDictionary *)specs
-                               withBridge:(const RCTBridge *)bridge
+- (UIFont * _Nullable)scaledUIFontFromUserSpecs:(const NSDictionary *)specs
 {
   const id allowFontScalingSrc = specs[@"allowFontScaling"];
-  const BOOL allowFontScaling = allowFontScalingSrc == nil ? YES : [allowFontScalingSrc boolValue];
+  const BOOL allowFontScaling = allowFontScalingSrc ? [allowFontScalingSrc boolValue] : YES;
   const CGFloat scaleMultiplier =
-  allowFontScaling && bridge ? bridge.accessibilityManager.multiplier : 1.0;
+  allowFontScaling && _bridge ? _bridge.accessibilityManager.multiplier : 1.0;
 
+  return [self UIFontFromUserSpecs:specs withScale:scaleMultiplier];
+}
+
+/**
+ * Create a font based on the given specs.
+ */
+- (UIFont * _Nullable)UIFontFromUserSpecs:(const NSDictionary *)specs
+                                withScale:(CGFloat)scaleMultiplier
+{
   return [RCTFont updateFont:nil
                   withFamily:[RCTConvert NSString:specs[@"fontFamily"]]
                         size:[RCTConvert NSNumber:specs[@"fontSize"]]
@@ -421,20 +405,19 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * The keys in the returned dictionary are a superset of the RN Text styles
  * so the format is not fully compatible.
  */
-+ (NSDictionary *)fontInfoFromUIFont:(const UIFont *)font
+- (NSDictionary *)fontInfoFromUIFont:(const UIFont *)font
 {
   const UIFontDescriptor *descriptor = font.fontDescriptor;
   const NSDictionary *traits = [descriptor objectForKey:UIFontDescriptorTraitsAttribute];
   const NSArray *fontVariant = [self fontVariantFromDescriptor:descriptor];
-  const id null = [NSNull null];
 
   return @{
-           @"fontFamily": font.familyName ?: null,
-           @"fontName": font.fontName ?: null,
+           @"fontFamily": RCTNullIfNil(font.familyName),
+           @"fontName": RCTNullIfNil(font.fontName),
            @"fontSize": @(font.pointSize),
            @"fontStyle": [self fontStyleFromTraits:traits],
            @"fontWeight": [self fontWeightFromTraits:traits],
-           @"fontVariant": fontVariant ?: null,
+           @"fontVariant": RCTNullIfNil(fontVariant),
            @"ascender": @(font.ascender),
            @"descender": @(font.descender),
            @"capHeight": @(font.capHeight),   // height of capital characters
@@ -453,7 +436,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * @param trais NSDictionary with the traits of the font.
  * @return NSString with the weight of the font.
  */
-+ (NSString *)fontWeightFromTraits:(const NSDictionary *)traits
+- (NSString *)fontWeightFromTraits:(const NSDictionary *)traits
 {
   // Use a small tolerance to avoid rounding problems
   const CGFloat weight = CGFloatValueFrom(traits[UIFontWeightTrait]) + 0.01;
@@ -474,7 +457,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * @param trais NSDictionary with the traits of the font.
  * @return NSString with the style.
  */
-+ (NSString *)fontStyleFromTraits:(const NSDictionary *)traits
+- (NSString *)fontStyleFromTraits:(const NSDictionary *)traits
 {
   const UIFontDescriptorSymbolicTraits symbolicTrais = [traits[UIFontSymbolicTrait] unsignedIntValue];
   const BOOL isItalic = (symbolicTrais & UIFontDescriptorTraitItalic) != 0;
@@ -491,7 +474,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * FIXME:
  * kNumberCase variants are not being recognized... RN bug?
  */
-+ (NSArray<NSString *> * _Nullable)fontVariantFromDescriptor:(const UIFontDescriptor *)descriptor
+- (NSArray<NSString *> * _Nullable)fontVariantFromDescriptor:(const UIFontDescriptor *)descriptor
 {
   const NSArray *features = descriptor.fontAttributes[UIFontDescriptorFeatureSettingsAttribute];
   if (isNull(features)) {
