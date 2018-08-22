@@ -58,16 +58,6 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
         return TAG;
     }
 
-    @Override
-    public Map<String, Object> getConstants() {
-        final Map<String, Object> constants = new HashMap<>();
-        final Map<String, Object> fontSizes = new HashMap<>();
-
-        fontSizes.put("default", RNTextSizeConf.getDefaultFontSize());
-        constants.put("FontSize", fontSizes);
-        return constants;
-    }
-
     /**
      * Based on ReactTextShadowNode.java
      */
@@ -91,11 +81,8 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
         final WritableMap result = Arguments.createMap();
         if (_text.isEmpty()) {
-            // RN 0.56 consistently sets the height at 14dp divided by the density
-            // plus 1 if includeFontPadding when text is empty, so we do the same.
-            float height = (14.0f / density) + (includeFontPadding ? 1 : 0);
             result.putInt("width", 0);
-            result.putDouble("height", height);
+            result.putDouble("height", minimalHeight(density, includeFontPadding));
             result.putInt("lastLineWidth", 0);
             result.putInt("lineCount", 0);
             promise.resolve(result);
@@ -208,7 +195,6 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
         RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
 
         final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        double minHeight = Double.NaN;
         Layout layout;
         try {
 
@@ -221,10 +207,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
                 final String text = texts.getString(ix);
                 if (text.isEmpty()) {
-                    if (Double.isNaN(minHeight)) {
-                        minHeight = (14.0f / density) + (includeFontPadding ? 1 : 0);
-                    }
-                    result.pushDouble(minHeight);
+                    result.pushDouble(minimalHeight(density, includeFontPadding);
                     continue;
                 }
 
@@ -369,6 +352,15 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
     @Nullable
     private RNTextSizeConf getConf(final ReadableMap specs, final Promise promise) {
         return getConf(specs, promise, false);
+    }
+
+    /**
+     * RN consistently sets the height at 14dp divided by the density
+     * plus 1 if includeFontPadding when text is empty, so we do the same.
+     */
+    private double minimalHeight(final float density, final boolean includeFontPadding) {
+        final double height = 14.0 / density;
+        return includeFontPadding ? height + 1.0 : height;
     }
 
     /**

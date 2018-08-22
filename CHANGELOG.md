@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Code cleanup, minor enhancements.
 
 ### Removed
-- iOS: Removed the `FontSize` constants.
+- Removed the `FontSize` constants.
 
 ## [2.0.0-beta.6] - 2018-08-21
 

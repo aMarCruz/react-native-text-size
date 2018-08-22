@@ -70,30 +70,32 @@ See [Manual Installation](https://github.com/aMarCruz/react-native-text-size/wik
 measure(options: TSMeasureParams): Promise<TSMeasureResult>
 ```
 
-This function measures the text like RN does when the text does not have embedded images or text with different sizes. It take a subset of the properties used by [`<Text>`](https://facebook.github.io/react-native/docs/text) to describe the font to use.
+This function measures the text as RN does and its result is consistent\* with that of `Text`'s onLayout event. It take a subset of the properties used by [`<Text>`](https://facebook.github.io/react-native/docs/text#props) to describe the font and other options to use.
 
-If you provide the `width`, the measurement will apply the restriction and take into account the automatic line breaks, in addition to the explicit ones.
+If you provide the `width`, the measurement will apply automatic wrapping in addition to the explicit line breaks.
+
+\* _On iOS, RN takes into account the absolute position on the screen to calculate the dimensions. rnTextSize can't do that but adds 1 pixel to both width and height avoid overflow._
 
 **NOTE:**
 
-Although this function is accurate and provides complete information, it can be heavy if the text is a lot, like the one that can be displayed in a FlatList. For these cases, it is better to use `flatHeights` which is much faster.
+Although this function is accurate and provides complete information, it can be heavy if the text is a lot, like the one that can be displayed in a FlatList. For these cases, it is better to use [`flatHeights`](#flatheights), which is optimized fotr those cases.
 
 <a name="tsmeasureparams"></a>**TSMeasureParams**
 
-JS object with the text to measure, the maximum width, and properties like ones in the react-native [`<Text>`](https://facebook.github.io/react-native/docs/text) component.
+Plain JS object with this properties:
 
 Property   | Type   | Default  | Notes
 ---------- | ------ | -------- | ------
 text       | string | (none)   | This is the only required parameter and may include _emojis_ or be empty, but it can not be `null`. If this is an empty string the resulting `width` will be zero.
 width      | number | Infinity | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
-usePreciseWidth | boolean | false | If `true`, request an exact `width` and the value of `lastWidth`. Used only in Android, iOS always returns both.<br>You can see the effect of this flag in the [sample App](https://github.com/aMarCruz/react-native-text-size/tree/master/example).
-fontFamily | string | OS dependent | The default is the same applied by React Native: Roboto in Android, San Francisco in iOS.<br>Note: Device manufacturer or custom ROM can change this
+usePreciseWidth | boolean | false | If `true`, request an exact `width` and the value of `lastLineWidth` (iOS always returns the exact width).<br>You can see the effect of this flag in the [sample App](https://github.com/aMarCruz/react-native-text-size/tree/master/example).
+fontFamily | string | OS dependent | The default is the same applied by React Native: Roboto in Android, San Francisco in iOS.<br>**Note:** Device manufacturer or custom ROM can change the default font.
 fontWeight | string | 'normal' | On android, numeric ranges has no granularity and '500' to '900' becomes 'bold', but you can use fonts of specific weights, like "sans-serif-medium".
-fontSize   | number | 14       | The default value is that used by RN and is provided in the `.FontSize.default` constant.
+fontSize   | number | 14       | The default value comes from RN.
 fontStyle  | string | 'normal' | One of "normal" or "italic".
 fontVariant         | array   | (none)        | _iOS only_
 allowFontScaling    | boolean | true | To respect the user' setting of large fonts (i.e. use SP units).
-letterSpacing       | number  | (none) | Additional spacing between characters (a.k.a. `tracking`).<br>NOTE: In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+ and RN 0.55+_
+letterSpacing       | number  | (none) | Additional spacing between characters (a.k.a. `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+ and RN 0.55+_
 includeFontPadding  | boolean | true | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
 textBreakStrategy   | string  | 'highQuality' | One of 'simple', 'balanced', or 'highQuality'.<br>_Android only, with API 23+_
 
@@ -105,7 +107,7 @@ The [sample App](https://github.com/aMarCruz/react-native-text-size/tree/master/
 
 Property  | Type   | Notes
 --------- | ------ | ------
-width     | number | Total used width. It may be less or equal to the given width and, in Andoid, its value may vary depending on the `usePreciseWidth` flag.
+width     | number | Total used width. It may be less or equal to the given width. On Android this value may vary depending on the `usePreciseWidth` flag.
 height    | number | Total height, including top and bottom padding if `includingFontPadding` was set (the default).
 lastLineWidth | number | Width of the last line, without trailing blanks.<br>__Note:__ If `usePreciseWidth` is `false` (the default), this field is undefined.
 lineCount | number | Number of lines, taking into account hard and automatic line breaks.
@@ -191,7 +193,6 @@ I did tests on 5,000 random text blocks and these were the results (ms):
 Android | 49,624    | 1,091
 iOS     |  1,949    |   732
 
-
 In the future I will prepare an example of its use with FlatList and multiple styles on the same card.
 
 **TSHeightsParams**
@@ -204,7 +205,7 @@ This is an object similar to the one received by `measure`, but the `text` prope
 
 Property   | Type   | Default
 ---------- | ------ | --------
-text       | string | (none)
+text       | string[] | (none)
 width      | number | Infinity
 fontFamily | string | OS dependent
 fontWeight | string | 'normal'
@@ -217,6 +218,8 @@ includeFontPadding  | boolean | true
 textBreakStrategy   | string  | 'highQuality'
 
 The result is a Promise that resolves to an array with the height of each block (_SP_), in the same order in which they were received.
+
+Unlike measure, `null` elements returns 0 without generating error, and empty strings returns the same height that RN assigns to empty `<Text>` components.
 
 ---
 
@@ -294,7 +297,7 @@ leading     | number | The recommended additional space to add between lines of 
 lineHeight  | number | The recommended line height (remember, _SP_ in Android). It should be greater if text contain Unicode symbols, such as emojis.
 _hash       | number | Hash code, maybe useful for debugging.
 
-> \* Using floats is more accurate than integers and allows you to use your preferred rounding method, but consider no more than 5 digits of precision in this values. Also, remember RN doesn't work with subpixels in Android and will truncate this values.
+\* _Using floats is more accurate than integers and allows you to use your preferred rounding method, but consider no more than 5 digits of precision in this values. Also, remember RN doesn't work with subpixels in Android and will truncate this values._
 
 See more in:
 
