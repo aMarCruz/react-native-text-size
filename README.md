@@ -31,7 +31,7 @@ Both, width and height, are practically the same as those received in the `onLay
 
 In addition, the library includes functions to obtain information about the fonts visible to the App.
 
-rnTextSize is WIP, but if it has helped you, please support my work with a star or [buy me a coffee](https://www.buymeacoffee.com/aMarCruz).
+rnTextSize is WIP, but if it has helped you, please support my work with a star :star2: or [buy me a coffee](https://www.buymeacoffee.com/aMarCruz).
 
 ---
 **IMPORTANT:**
@@ -45,7 +45,7 @@ rnTextSize is WIP, but if it has helped you, please support my work with a star 
 - React Native v0.52.0 or later
 - Targets Androind API 16 and iOS 9.0
 
-The [sample App](https://github.com/aMarCruz/react-native-text-size/tree/master/example) uses RN v0.52.0, which is the minimum version supported by rnTextSize, but you can change it (See your README before testing it).
+The [sample App](https://github.com/aMarCruz/rn-text-size-sample-app) uses RN v0.52.0, which is the minimum version supported by rnTextSize, but you can change it (See your README before testing it).
 
 To take advantage of features such as `letterSpacing`, and better support for the most modern devices, use RN v0.55 or above.
 
@@ -58,11 +58,23 @@ $ yarn add react-native-text-size
 $ react-native link react-native-text-size
 ```
 
-If you are using Gradle plugin 3 or later, don't forget to change the `compile` directive to `implementation` in the dependencies block of the android/app/build.gradle file.
+If you are using Gradle 4 or later, don't forget to change the `compile` directive to `implementation` in the dependencies block of the android/app/build.gradle file.
 
 See [Manual Installation](https://github.com/aMarCruz/react-native-text-size/wiki/Manual-Installation) on the Wiki as an alternative if you have problems with automatic installation.
 
 # API
+
+- [`measure`](#measure)
+
+- [`flatHeights`](#flatheights)
+
+- [`specsForTextStyles`](#specsfortextstyles)
+
+- [`fontFromSpecs`](#fontfromspecs)
+
+- [`fontFamilyNames`](#fontfamilynames)
+
+- [`fontNamesForFamilyName`](#fontnamesforfamilyname)
 
 ## `measure`
 
@@ -74,7 +86,7 @@ This function measures the text as RN does and its result is consistent\* with t
 
 If you provide the `width`, the measurement will apply automatic wrapping in addition to the explicit line breaks.
 
-\* _On iOS, RN takes into account the absolute position on the screen to calculate the dimensions. rnTextSize can't do that and both width and height can have a difference of uo to 1 pixel (not point)._
+\* _There may be some inconsistencies in iOS, see this [Know Issue](#incorrent-height-ios) to know more._
 
 **NOTE:**
 
@@ -88,18 +100,18 @@ Property   | Type   | Default  | Notes
 ---------- | ------ | -------- | ------
 text       | string | (none)   | This is the only required parameter and may include _emojis_ or be empty, but it can not be `null`. If this is an empty string the resulting `width` will be zero.
 width      | number | Infinity | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
-usePreciseWidth | boolean | false | If `true`, request an exact `width` and the value of `lastLineWidth` (iOS always returns the exact width).<br>You can see the effect of this flag in the [sample App](https://github.com/aMarCruz/react-native-text-size/tree/master/example).
+usePreciseWidth | boolean | false | If `true`, request an exact `width` and the value of `lastLineWidth` (iOS always returns the exact width).<br>You can see the effect of this flag in the [sample App](https://github.com/aMarCruz/rn-text-size-sample-app).
 fontFamily | string | OS dependent | The default is the same applied by React Native: Roboto in Android, San Francisco in iOS.<br>**Note:** Device manufacturer or custom ROM can change the default font.
 fontWeight | string | 'normal' | On android, numeric ranges has no granularity and '500' to '900' becomes 'bold', but you can use fonts of specific weights, like "sans-serif-medium".
 fontSize   | number | 14       | The default value comes from RN.
 fontStyle  | string | 'normal' | One of "normal" or "italic".
-fontVariant         | array   | (none)        | _iOS only_
+fontVariant         | array   | (none) | _iOS only_
 allowFontScaling    | boolean | true | To respect the user' setting of large fonts (i.e. use SP units).
 letterSpacing       | number  | (none) | Additional spacing between characters (a.k.a. `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+ and RN 0.55+_
 includeFontPadding  | boolean | true | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
 textBreakStrategy   | string  | 'highQuality' | One of 'simple', 'balanced', or 'highQuality'.<br>_Android only, with API 23+_
 
-The [sample App](https://github.com/aMarCruz/react-native-text-size/tree/master/example) shows interactively the effect of these parameters on the screen.
+The [sample App](https://github.com/aMarCruz/rn-text-size-sample-app) shows interactively the effect of these parameters on the screen.
 
 **TSMeasureResult**
 
@@ -172,8 +184,6 @@ class Test extends Component<Props, State> {
 }
 ```
 
----
-
 ## `flatHeights`
 
 ```ts
@@ -221,12 +231,11 @@ The result is a Promise that resolves to an array with the height of each block 
 
 Unlike measure, `null` elements returns 0 without generating error, and empty strings returns the same height that RN assigns to empty `<Text>` components.
 
----
 
 ## `specsForTextStyles`
 
 ```ts
-specsForTextStyles(): Promise<{ [key: string]: TSFontSpec }>
+specsForTextStyles(): Promise<{ [key: string]: TSFontForStyle }>
 ```
 
 Get system font information for the running OS.
@@ -250,7 +259,6 @@ To know the key names, please see [Keys from specsForTextStyles](https://github.
 
 I have not tried to normalize these keys since, with the exception of 2 or 3, they have a different interpretation in each OS. You will know how to use them to create custom styles according to your needs.
 
----
 
 ## `fontFromSpecs`
 
@@ -307,11 +315,10 @@ See more in:
 
 **Tip**
 
-> Avoid `allowsFontScaling: false`.
->
-> When setting the `fontSize` and `lineHeight` properties of `<Text>` and `<TextInput>`, if you omit, or set `allowFontScaling:true`, React Native performs the conversion and scaling automatically.
+Avoid `allowsFontScaling: false`.
 
----
+When setting the `fontSize` and `lineHeight` properties of `<Text>` and `<TextInput>`, if you omit, or set `allowFontScaling:true`, React Native performs the conversion and scaling automatically.
+
 
 ## `fontFamilyNames`
 
@@ -327,7 +334,6 @@ On Android the result is hard-coded for the system fonts and complemented dynami
 
 See [About Android Fonts](https://github.com/aMarCruz/react-native-text-size/wiki/About-Android-Fonts) and [Custom Fonts](https://github.com/aMarCruz/react-native-text-size/wiki/Custom-Fonts) in the Wiki to know more about this list.
 
----
 
 ## `fontNamesForFamilyName`
 
@@ -344,7 +350,21 @@ You can use the rnTextSize's `fontFamilyNames` function to get an array of the a
 
 ## Known Issues
 
+#### Incorrent height (iOS)
+
+On iOS, RN takes into account the absolute position on the screen to calculate the dimensions. rnTextSize can't do that and both, width and height, can have a difference of up to 1 pixel (not point).
+
+#### letterSpacing not scaling (iOS)
+
+RN does not support the [Dynamic Type Sizes](https://developer.apple.com/design/human-interface-guidelines/ios/visual-design/typography#dynamic-type-sizes), but does an excellent job imitating this feature through `allowFontScaling` ...except for `letterSpacing` that is not scaled.
+
+I hope that a future version of RN solves this issue.
+
+#### lineHeight Support
+
 Although rnTextSize provides the resulting `lineHeight` in some functions, it does not support it as a parameter because RN uses a non-standard algorithm to set it. I recommend you do not use `lineHeight` unless it is strictly necessary, but if you use it, try to make it 30% or more than the font size, or use rnTextSize [`fontFromSpecs`](#fontfromspecs) method if you want more precision.
+
+#### Nexted Text
 
 Nested `<Text>` components (or with images inside) can be rasterized with dimensions different from those calculated, rnTextSize does not accept multiple sizes in the text.
 
@@ -369,6 +389,7 @@ I'm a full-stack developer with more than 20 year of experience and I try to sha
 Feedback, PRs stars, and smiles are also welcome.
 
 Thanks for your support!
+
 
 ## License
 
