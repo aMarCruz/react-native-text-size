@@ -74,7 +74,7 @@ This function measures the text as RN does and its result is consistent\* with t
 
 If you provide the `width`, the measurement will apply automatic wrapping in addition to the explicit line breaks.
 
-\* _On iOS, RN takes into account the absolute position on the screen to calculate the dimensions. rnTextSize can't do that but adds 1 pixel to both width and height avoid overflow._
+\* _On iOS, RN takes into account the absolute position on the screen to calculate the dimensions. rnTextSize can't do that and both width and height can have a difference of uo to 1 pixel (not point)._
 
 **NOTE:**
 

@@ -17,7 +17,9 @@ import com.facebook.react.views.text.ReactFontManager;
 
 import java.util.Map;
 
+@SuppressWarnings("SameParameterValue")
 final class RNTextSizeConf {
+
     private static final float DEF_FONTSIZE = 14.0f;
     private static final int reactNativeVersion;
 
@@ -53,10 +55,6 @@ final class RNTextSizeConf {
     // letterSpacing is supported in RN 0.55+
     static boolean supportLetterSpacing() {
         return reactNativeVersion >= 55;
-    }
-
-    static float getDefaultFontSize() {
-        return DEF_FONTSIZE;
     }
 
     private final ReadableMap mOpts;
@@ -102,7 +100,6 @@ final class RNTextSizeConf {
                 ? mOpts.getString(name) : null;
     }
 
-    @SuppressWarnings("SameParameterValue")
     @Nullable
     ReadableArray getArray(@NonNull final String name) {
         return mOpts.hasKey(name) && mOpts.getType(name) == ReadableType.Array

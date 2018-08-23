@@ -28,9 +28,7 @@ import com.facebook.react.uimanager.DisplayMetricsHolder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 class RNTextSizeModule extends ReactContextBaseJavaModule {
     private static final String TAG = "RNTextSize";
@@ -207,7 +205,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
                 final String text = texts.getString(ix);
                 if (text.isEmpty()) {
-                    result.pushDouble(minimalHeight(density, includeFontPadding);
+                    result.pushDouble(minimalHeight(density, includeFontPadding));
                     continue;
                 }
 
