@@ -7,16 +7,16 @@ Measure text accurately before laying it out and get font information from your 
 
 The text to be measured is required, the rest of the parameters supported are optional and work in the same way as with React Native:
 
-- Font family, with the common name or specific filename for Android or font-name for iOS.
-- Font size
-- Font weight
-- Font style
-- Font variant (iOS)
-- Include font padding (Android)
-- Text break strategy (Android)
-- Letter spacing
-- Allow font scaling
-- Maximum width, for automatic line-break based on text-break strategy.
+- `fontFamily`
+- `fontSize`
+- `fontWeight`
+- `fontStyle`
+- `fontVariant` (iOS)
+- `includeFontPadding` (Android)
+- `textBreakStrategy` (Android)
+- `letterSpacing`
+- `allowFontScaling`
+- `width`: Constraint for automatic line-break based on text-break strategy.
 
 There are two main functions, one to obtain the height of different blocks of text simultaneously, optimized for components such as `<FlatList>`.
 
@@ -36,22 +36,20 @@ rnTextSize is WIP, but if it has helped you, please support my work with a star 
 ---
 **IMPORTANT:**
 
-**rnTextSize (react-native-text-size) v2.0 is a complete refactoring, before using it, please uninstall the previous version.**
+**rnTextSize (react-native-text-size) v2.0 is a complete refactoring, before using it, please unlink the previous version.**
+
+**If `react-native unlink` fails, it reverses the changes described in [Manual Installation](https://github.com/aMarCruz/react-native-text-size/wiki/Manual-Installation).**
 
 ---
 
 **Requirements:**
 
 - React Native v0.52.0 or later
-- Targets Androind API 16 and iOS 9.0
+- Targets Android API 16 and iOS 9.0
 
-The [sample App](https://github.com/aMarCruz/rn-text-size-sample-app) uses RN v0.52.0, which is the minimum version supported by rnTextSize, but you can change it (See your README before testing it).
-
-To take advantage of features such as `letterSpacing`, and better support for the most modern devices, use RN v0.55 or above.
+The [sample App](https://github.com/aMarCruz/rn-text-size-sample-app) uses RN v0.52.0, which is the minimum version supported by rnTextSize but, to take advantage of features such as `letterSpacing` and better support for the most modern devices, use RN v0.55 or above.
 
 ## Installation
-
-Mostly automatic:
 
 ```bash
 $ yarn add react-native-text-size
@@ -278,7 +276,7 @@ fontFamily | string | iOS: 'San Francisco', Android: 'Roboto'
 fontWeight | string | 'normal'
 fontSize   | number | 14
 fontStyle  | string | 'normal'
-fontVariant   | array | (none)
+fontVariant   | string[] | (none)
 letterSpacing | number | 0
 
 `fontFromSpecs` uses an implicit `allowsFontScaling:true` and, since this is not a measuring function, `includeFontPadding` has no meaning.
@@ -292,9 +290,9 @@ Property    | Type   | Details
 fontFamily  | string | In Android it is the same string passed as parameter.
 fontName    | string |_iOS only_, always `undefined` in Android.
 fontSize    | number | It may be different from the given parameter if it includes decimals.
-fontStyle   | TFontStyle   | 'normal' or 'italic'.
-fontWeight  | TFontWeight  | 'normal' or 'bold', on iOS it can go from '100' to '900'.
-fontVariant | TFontVariant | _iOS only_, always `undefined` in Android.
+fontStyle   | string | 'normal' or 'italic'.
+fontWeight  | string | 'normal' or 'bold', on iOS it can go from '100' to '900'.
+fontVariant | string[] | _iOS only_, always `undefined` in Android.
 ascender    | number | The recommended distance above the baseline for singled spaced text.
 descender   | number | The recommended distance below the baseline for singled spaced text.
 capHeight   | number | _iOS only_ Height of capital characters.

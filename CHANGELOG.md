@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ## [Unreleased]
 
 ### Fixed
-- Some error in the README
+- Some error in the README and include note about unlink the previous version.
 
 ## [2.0.1] - 2018-08-22
 
