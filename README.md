@@ -27,7 +27,7 @@ The other one gets detailed information about a block of text:
 - The number of lines.
 - The width of the last line, if required, useful to save space with "See more..." style labels or time stamps.
 
-Both, width and height, are practically the same as those received in the `onLayout` event of a `<Text>` component with the same properties.
+Both, width and height, are practically the same as those received from the `onLayout` event of a `<Text>` component with the same properties.
 
 In addition, the library includes functions to obtain information about the fonts visible to the App.
 
@@ -38,7 +38,7 @@ rnTextSize is WIP, but if it has helped you, please support my work with a star 
 
 **rnTextSize (react-native-text-size) v2.0 is a complete refactoring, before using it, please unlink the previous version.**
 
-**If `react-native unlink` fails, it reverses the changes described in [Manual Installation](https://github.com/aMarCruz/react-native-text-size/wiki/Manual-Installation).**
+**If `react-native unlink` fails, please reverse the changes described in [Manual Installation](https://github.com/aMarCruz/react-native-text-size/wiki/Manual-Installation).**
 
 ---
 
@@ -47,7 +47,7 @@ rnTextSize is WIP, but if it has helped you, please support my work with a star 
 - React Native v0.52.0 or later
 - Targets Android API 16 and iOS 9.0
 
-The [sample App](https://github.com/aMarCruz/rn-text-size-sample-app) uses RN v0.52.0, which is the minimum version supported by rnTextSize but, to take advantage of features such as `letterSpacing` and better support for the most modern devices, use RN v0.55 or above.
+The [sample App](https://github.com/aMarCruz/rn-text-size-sample-app) uses RN v0.52.0, the minimum supported version but, to take advantage of features such as `letterSpacing` and better support for the most modern devices, use RN v0.55 or above.
 
 ## Installation
 
@@ -60,7 +60,7 @@ If you are using Gradle 4 or later, don't forget to change the `compile` directi
 
 See [Manual Installation](https://github.com/aMarCruz/react-native-text-size/wiki/Manual-Installation) on the Wiki as an alternative if you have problems with automatic installation.
 
-# API
+## API
 
 - [`measure`](#measure)
 
@@ -74,7 +74,7 @@ See [Manual Installation](https://github.com/aMarCruz/react-native-text-size/wik
 
 - [`fontNamesForFamilyName`](#fontnamesforfamilyname)
 
-## `measure`
+## measure
 
 ```js
 measure(options: TSMeasureParams): Promise<TSMeasureResult>
@@ -88,7 +88,7 @@ If you provide the `width`, the measurement will apply automatic wrapping in add
 
 **NOTE:**
 
-Although this function is accurate and provides complete information, it can be heavy if the text is a lot, like the one that can be displayed in a FlatList. For these cases, it is better to use [`flatHeights`](#flatheights), which is optimized fotr those cases.
+Although this function is accurate and provides complete information, it can be heavy if the text is a lot, like the one that can be displayed in a FlatList. For these cases, better to use [`flatHeights`](#flatheights), which is optimized for batch processing.
 
 <a name="tsmeasureparams"></a>**TSMeasureParams**
 
@@ -182,7 +182,7 @@ class Test extends Component<Props, State> {
 }
 ```
 
-## `flatHeights`
+## flatHeights
 
 ```ts
 flatHeights(options: TSHeightsParams): Promise<number[]>
@@ -190,7 +190,7 @@ flatHeights(options: TSHeightsParams): Promise<number[]>
 
 Calculate the height of each of the strings in an array.
 
-This is an alternative to `measure` designed for cases in which you have to calculate the height of numerous text blocks with common characteristics (width, font, etc), a Typical case in the `<FlatList>`.
+This is an alternative to `measure` designed for cases in which you have to calculate the height of numerous text blocks with common characteristics (width, font, etc), a Typical case with `<FlatList>`.
 
 The measurement uses the same algorithm as `measure` but it returns only the height of each block and, by avoiding multiple steps through the bridge, it is faster... _much faster_ on Android!
 
@@ -205,11 +205,7 @@ In the future I will prepare an example of its use with FlatList and multiple st
 
 **TSHeightsParams**
 
-This is an object similar to the one received by measure, with the difference that the text property is an array of strings, and the usePreciseWidth property is ignored.
-
-The result is an array with the height of each block, in the same order was given.
-
-This is an object similar to the one received by `measure`, but the `text` property is an array of strings and the `usePreciseWidth` property is ignored.
+This is an object similar to the one you pass to `measure`, but the `text` property is an array of strings and the `usePreciseWidth` property is ignored.
 
 Property   | Type   | Default
 ---------- | ------ | --------
@@ -225,12 +221,12 @@ letterSpacing       | number  | (none)
 includeFontPadding  | boolean | true
 textBreakStrategy   | string  | 'highQuality'
 
-The result is a Promise that resolves to an array with the height of each block (_SP_), in the same order in which they were received.
+The result is a Promise that is resolves with an array with the height of each block (_SP_), in the same order in which the blocks were received.
 
-Unlike measure, `null` elements returns 0 without generating error, and empty strings returns the same height that RN assigns to empty `<Text>` components.
+Unlike measure, `null` elements returns 0 without generating error, and empty strings returns the same height that RN assigns to empty `<Text>` components (the difference of the result between `null` and empty is intentional).
 
 
-## `specsForTextStyles`
+## specsForTextStyles
 
 ```ts
 specsForTextStyles(): Promise<{ [key: string]: TSFontForStyle }>
@@ -248,9 +244,9 @@ Property      | Type         | Notes
 ------------- | ------------ |------
 fontFamily    | string       | System family name or font face.
 fontSize      | number       | Font size in _SP_ (unscaled).
-fontStyle     | TSFontStyle  | Only if 'italic', undefined for 'normal' style.
-fontWeight    | TSFontWeight | Undefined if the font weight is 'normal'.
-fontVariant   | TSFontVariant[] or null | _iOS only_.
+fontStyle     | TSFontStyle  | Only if 'italic', undefined if the style is 'normal'.
+fontWeight    | TSFontWeight | Only if 'bold', undefined if the weight is 'normal'.
+fontVariant   | TSFontVariant[] or null | _iOS only_. Currently, no style includes this property.
 letterSpacing | number       | Omitted if running on Android with RN lower than 0.55
 
 To know the key names, please see [Keys from specsForTextStyles](https://github.com/aMarCruz/react-native-text-size/wiki/Keys-from-specsForTextStyles) the Wiki.
@@ -258,7 +254,7 @@ To know the key names, please see [Keys from specsForTextStyles](https://github.
 I have not tried to normalize these keys since, with the exception of 2 or 3, they have a different interpretation in each OS. You will know how to use them to create custom styles according to your needs.
 
 
-## `fontFromSpecs`
+## fontFromSpecs
 
 ```ts
 fontFromSpecs(specs: TSFontSpecs): Promise<TSFontInfo>
@@ -318,7 +314,7 @@ Avoid `allowsFontScaling: false`.
 When setting the `fontSize` and `lineHeight` properties of `<Text>` and `<TextInput>`, if you omit, or set `allowFontScaling:true`, React Native performs the conversion and scaling automatically.
 
 
-## `fontFamilyNames`
+## fontFamilyNames
 
 ```ts
 fontFamilyNames(): Promise<string[]>
@@ -333,7 +329,7 @@ On Android the result is hard-coded for the system fonts and complemented dynami
 See [About Android Fonts](https://github.com/aMarCruz/react-native-text-size/wiki/About-Android-Fonts) and [Custom Fonts](https://github.com/aMarCruz/react-native-text-size/wiki/Custom-Fonts) in the Wiki to know more about this list.
 
 
-## `fontNamesForFamilyName`
+## fontNamesForFamilyName
 
 ```ts
 fontNamesForFamilyName(fontFamily: string): Promise<string[]>
@@ -370,7 +366,7 @@ Nested `<Text>` components (or with images inside) can be rasterized with dimens
 ## TODO
 
 - [X] Normalized tracking or letter spacing in font info.
-- [ ] Including `lineHeight` in specsForTextStyles.
+- [ ] Including `lineHeight` in specsForTextStyles?
 - [ ] More testing, including Android and iOS TVs.
 - [ ] Learn the beautiful English, to make better docs.
 - [ ] Learn the ugly Objective-C, after almost a month of studying I don't find it pretty.
