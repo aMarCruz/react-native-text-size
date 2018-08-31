@@ -8,10 +8,10 @@ def safeExtGet(prop, fallback) {
     rootProject.hasProperty(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-def DEF_BUILD_TOOLS_VERSION = '26.0.3'
-def DEF_COMPILE_SDK_VERSION = 26
-def DEF_TARGET_SDK_VERSION  = 26
-def DEF_MIN_SDK_VERSION     = 16
+def _buildToolsVersion  = safeExtGet('buildToolsVersion', '26.0.3')
+def _compileSdkVersion  = safeExtGet('compileSdkVersion', 26)
+def _targetSdkVersion   = safeExtGet('targetSdkVersion', 26)
+def _minSdkVersion      = safeExtGet('minSdkVersion', 16)
 
 buildscript {
     repositories {
@@ -29,12 +29,12 @@ buildscript {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', DEF_COMPILE_SDK_VERSION)
-    buildToolsVersion safeExtGet('buildToolsVersion', DEF_BUILD_TOOLS_VERSION)
+    compileSdkVersion _compileSdkVersion
+    buildToolsVersion _buildToolsVersion
 
     defaultConfig {
-        minSdkVersion safeExtGet('minSdkVersion', DEF_MIN_SDK_VERSION)
-        targetSdkVersion safeExtGet('targetSdkVersion', DEF_TARGET_SDK_VERSION)
+        minSdkVersion _minSdkVersion
+        targetSdkVersion _targetSdkVersion
         versionCode 2
         versionName getPackageVersion()
     }
