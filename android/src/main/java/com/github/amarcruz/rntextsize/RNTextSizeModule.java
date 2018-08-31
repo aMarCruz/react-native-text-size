@@ -198,17 +198,21 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
             for (int ix = 0; ix < texts.size(); ix++) {
 
+                // If this element is `null` or another type, return zero
                 if (texts.getType(ix) != ReadableType.String) {
                     result.pushInt(0);
                     continue;
                 }
 
                 final String text = texts.getString(ix);
+
+                // If empty, return the minimum height of <Text> components
                 if (text.isEmpty()) {
                     result.pushDouble(minimalHeight(density, includeFontPadding));
                     continue;
                 }
 
+                // Reset the SB text, the attrs will expand to its full length
                 sb.replace(0, sb.length(), text);
 
                 if (Build.VERSION.SDK_INT >= 23) {

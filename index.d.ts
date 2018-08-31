@@ -75,7 +75,7 @@ declare module "react-native-text-size" {
   }
 
   export type TSFontForStyle = {
-    fontFamily: string | void,
+    fontFamily: string,
     /** Unscaled font size, untits are SP in Android, points in iOS */
     fontSize: number,
     /** fontStyle is omitted if it is "normal" */
@@ -90,7 +90,7 @@ declare module "react-native-text-size" {
 
   export interface TSHeightsParams extends TSFontSpecs {
     /** The required text to measure. */
-    text: string[];
+    text: Array<string | null>;
     /** Maximum width of the area to display the text. @default MAX_INT */
     width?: number;
     /** @default true */

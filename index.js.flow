@@ -60,7 +60,7 @@ export type TSFontInfo = {
 }
 
 export type TSFontSpecs = {
-  fontFamily?: string | void,
+  fontFamily?: string,
   fontSize?: number,
   fontStyle?: TSFontStyle,
   fontWeight?: TSFontWeight,
@@ -75,7 +75,7 @@ export type TSFontSpecs = {
 }
 
 export type TSFontForStyle = {
-  fontFamily: string | void,
+  fontFamily: string,
   fontSize: number,
   /** fontStyle is omitted if it is "normal" */
   fontStyle?: TSFontStyle,
@@ -89,7 +89,7 @@ export type TSFontForStyle = {
 
 export type TSHeightsParams = TSFontSpecs & {
   /** The required text to measure. */
-  text: string[],
+  text: (string | null)[],
   /** Maximum width of the area to display the text. @default MAX_INT */
   width?: number,
   /** @default true */

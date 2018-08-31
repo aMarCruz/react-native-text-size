@@ -3,12 +3,10 @@
 #if __has_include(<React/RCTConvert.h>)
 #import <React/RCTConvert.h>
 #import <React/RCTFont.h>
-#import <React/RCTLog.h>
 #import <React/RCTUtils.h>
 #else
 #import "React/RCTConvert.h"   // Required when used as a Pod in a Swift project
 #import "React/RCTFont.h"
-#import "React/RCTLog.h"
 #import "React/RCTUtils.h"
 #endif
 
@@ -75,7 +73,7 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
   }
 
   // Allow empty text without generating error
-  // TODO: Return the same height as RN.
+  // ~~TODO~~: Return the same height as RN. @completed(v2.0.1)
   if (!text.length) {
     resolve(@{
               @"width": @0,
@@ -185,26 +183,31 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
   NSLayoutManager *layoutManager = [NSLayoutManager new];
   [layoutManager addTextContainer:textContainer];
 
+  NSTextStorage *textStorage = [[NSTextStorage alloc] initWithString:@" " attributes:attributes];
+  [textStorage addLayoutManager:layoutManager];
+
   NSMutableArray<NSNumber *> *result = [[NSMutableArray alloc] initWithCapacity:texts.count];
   const CGFloat epsilon = 0.001;
 
   for (int ix = 0; ix < texts.count; ix++) {
     NSString *text = texts[ix];
-    if (!text) {
+
+    // If this element is `null` or another type, return zero
+    if (![text isKindOfClass:[NSString class]]) {
       result[ix] = @0;
       continue;
     }
-    if (text == (id) kCFNull) {
+
+    // If empty, return the minimum height of <Text> components
+    if (!text.length) {
       result[ix] = @14;
       continue;
     }
 
-    NSTextStorage *textStorage = [[NSTextStorage alloc] initWithString:text attributes:attributes];
-    [textStorage addLayoutManager:layoutManager];
-
-    [layoutManager ensureLayoutForTextContainer:textContainer];
+    // Reset the textStorage, the attrs will expand to its new length
+    NSRange range = NSMakeRange(0, textStorage.length);
+    [textStorage replaceCharactersInRange:range withString:text];
     CGSize size = [layoutManager usedRectForTextContainer:textContainer].size;
-    [textStorage removeLayoutManager:layoutManager];
 
     const CGFloat height = MIN(RCTCeilPixelValue(size.height + epsilon), maxSize.height);
     result[ix] = @(height);
