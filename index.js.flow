@@ -89,7 +89,7 @@ export type TSFontForStyle = {
 
 export type TSHeightsParams = TSFontSpecs & {
   /** The required text to measure. */
-  text: (string | null)[],
+  text: Array<string>,
   /** Maximum width of the area to display the text. @default MAX_INT */
   width?: number,
   /** @default true */
