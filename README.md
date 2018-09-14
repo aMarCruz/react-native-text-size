@@ -5,7 +5,18 @@
 
 Measure text accurately before laying it out and get font information from your App (Android and iOS).
 
-The text to be measured is required, the rest of the parameters supported are optional and work in the same way as with React Native:
+There are two main functions: `flatHeights` to obtain the height of different blocks of text simultaneously, optimized for components such as `<FlatList>`.
+
+The other one is `measure`, which gets detailed information about one block of text:
+
+- The width used by the text, with an option to calculate the real width of the largest line.
+- Height, with or without paddings.
+- The number of lines.
+- The width of the last line, if required, useful to save space with "See more..." style labels or time stamps.
+
+The width and height are practically the same as those received from the `onLayout` event of a `<Text>` component with the same properties.
+
+In both functions, the text to be measured is required, but the rest of the parameters supported are optional and work in the same way as with React Native:
 
 - `fontFamily`
 - `fontSize`
@@ -17,17 +28,6 @@ The text to be measured is required, the rest of the parameters supported are op
 - `letterSpacing`
 - `allowFontScaling`
 - `width`: Constraint for automatic line-break based on text-break strategy.
-
-There are two main functions, one to obtain the height of different blocks of text simultaneously, optimized for components such as `<FlatList>`.
-
-The other one gets detailed information about a block of text:
-
-- The width used by the text, with an option to calculate the real width of the largest line.
-- Height, with or without paddings.
-- The number of lines.
-- The width of the last line, if required, useful to save space with "See more..." style labels or time stamps.
-
-Both, width and height, are practically the same as those received from the `onLayout` event of a `<Text>` component with the same properties.
 
 In addition, the library includes functions to obtain information about the fonts visible to the App.
 
@@ -190,7 +190,7 @@ flatHeights(options: TSHeightsParams): Promise<number[]>
 
 Calculate the height of each of the strings in an array.
 
-This is an alternative to `measure` designed for cases in which you have to calculate the height of numerous text blocks with common characteristics (width, font, etc), a Typical case with `<FlatList>`.
+This is an alternative to `measure` designed for cases in which you have to calculate the height of numerous text blocks with common characteristics (width, font, etc), a Typical use case with `<FlatList>`.
 
 The measurement uses the same algorithm as `measure` but it returns only the height of each block and, by avoiding multiple steps through the bridge, it is faster... _much faster_ on Android!
 
