@@ -161,6 +161,11 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             result.putDouble("height", layout.getHeight() / density);
             result.putInt("lineCount", lineCount);
 
+            Integer lineEnd = conf.getIntOrNull("lineEnd");
+            if (lineEnd != null) {
+                result.putInt("lineEnd", layout.getLineVisibleEnd(lineEnd));
+            }
+
             promise.resolve(result);
         } catch (Exception e) {
             promise.reject(E_UNKNOWN_ERROR, e);
@@ -238,7 +243,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
                 result.pushDouble(layout.getHeight() / density);
             }
 
-        promise.resolve(result);
+            promise.resolve(result);
         } catch (Exception e) {
             promise.reject(E_UNKNOWN_ERROR, e);
         }

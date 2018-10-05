@@ -106,6 +106,8 @@ declare module "react-native-text-size" {
     allowFontScaling?: boolean;
     /** Request an exact width calculation. For Android, iOS always do this. */
     usePreciseWidth?: boolean;
+    /** Request line end character index for the given line number - Android only **/
+    lineEnd?: number;
   }
 
   export type TSMeasureResult = {
@@ -113,6 +115,7 @@ declare module "react-native-text-size" {
     height: number,
     lastLineWidth?: number,
     lineCount: number,
+    lineEnd?: number,
   }
 
   interface TextSizeStatic {
