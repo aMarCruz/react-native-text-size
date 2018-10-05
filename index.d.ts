@@ -115,7 +115,7 @@ declare module "react-native-text-size" {
     height: number,
     lastLineWidth?: number,
     lineCount: number,
-    lineEnd?: number,
+    lineEndForLineNo?: number,
   }
 
   interface TextSizeStatic {

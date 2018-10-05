@@ -161,9 +161,9 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             result.putDouble("height", layout.getHeight() / density);
             result.putInt("lineCount", lineCount);
 
-            Integer lineEnd = conf.getIntOrNull("lineEnd");
-            if (lineEnd != null) {
-                result.putInt("lineEnd", layout.getLineVisibleEnd(lineEnd));
+            Integer lineEndForLineNo = conf.getIntOrNull("lineEndForLineNo");
+            if (lineEndForLineNo != null) {
+                result.putInt("lineEnd", layout.getLineVisibleEnd(lineEndForLineNo));
             }
 
             promise.resolve(result);
