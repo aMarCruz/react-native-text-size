@@ -105,6 +105,8 @@ export type TSMeasureParams = TSFontSpecs & {
   allowFontScaling?: boolean,
   /** Request an exact width calculation. For Android, iOS always do this. */
   usePreciseWidth?: boolean;
+  /** Request line end character index for the given line number - Android only **/
+  lineEnd?: number;
 }
 
 export interface TSMeasureResult {
@@ -112,6 +114,7 @@ export interface TSMeasureResult {
   height: number;
   lastLineWidth?: number;
   lineCount: number;
+  lineEndForLineNo?: number;
 }
 
 declare interface TextSizeStatic {
