@@ -45,7 +45,7 @@ react-native link react-native-text-size
 
 **Requirements:**
 
-- React Native v0.52.0 or later.
+- React Native v0.52 to v0.56.
 - Android API 16 or iOS 9.0 and above.
 
 If you are using Gradle 4 or later, don't forget to change the `compile` directive to `implementation` in the dependencies block of the android/app/build.gradle file.
@@ -338,6 +338,10 @@ You can use the rnTextSize's `fontFamilyNames` function to get an array of the a
 This is an **iOS only** function, on Android it always resolves to `null`.
 
 ## Known Issues
+
+### Inconsistent width between platforms
+
+In iOS, the resulting width of both, `measure` and `flatHeights`, includes leading whitespace while in Android these are discarded.
 
 ### Incorrent height (iOS)
 

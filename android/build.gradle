@@ -5,7 +5,7 @@ def getPackageVersion() {
 }
 
 def safeExtGet(prop, fallback) {
-    rootProject.hasProperty(prop) ? rootProject.ext.get(prop) : fallback
+    return rootProject.ext.hasProperty(prop) ? rootProject.ext.get(prop) : fallback
 }
 
 def _buildToolsVersion  = safeExtGet('buildToolsVersion', '26.0.3')
