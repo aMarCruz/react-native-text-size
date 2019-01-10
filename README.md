@@ -50,7 +50,7 @@ Change the `compile` directive to `implementation` in the dependencies block of 
 - React Native v0.57 or later.
 - Android API 16 or iOS 9.0 and above.
 
-For versions prior to 0.56 of React Native, please use react-native-text-size v2.1.0
+For versions prior to 0.56 of React Native, please use [react-native-text-size v2.1.1](https://www.npmjs.com/package/react-native-text-size/v/2.1.1)
 
 See [Manual Installation][2] on the Wiki as an alternative if you have problems with automatic installation.
 
