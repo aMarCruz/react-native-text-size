@@ -162,7 +162,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
             Integer lineInfoForLine = conf.getIntOrNull("lineInfoForLine");
             if (lineInfoForLine != null && lineInfoForLine >= 0) {
-                final int line = Math.max(lineInfoForLine, lineCount);
+                final int line = Math.min(lineInfoForLine, lineCount);
                 final WritableMap info = Arguments.createMap();
                 info.putInt("line", line);
                 info.putInt("start", layout.getLineStart(line));
@@ -257,10 +257,6 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
     /**
      * See https://material.io/design/typography/#type-scale
-     *
-     * TODO:
-     * Send PR to RN for supporting textTransform, like the iOS one in
-     * https://github.com/facebook/react-native/commit/8621d4b79731e13a0c6e397abd93c193c6219000
      */
     @SuppressWarnings("unused")
     @ReactMethod
@@ -277,9 +273,9 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
         result.putMap("subtitle2", makeFontSpecs("-medium", 14, 0.1));
         result.putMap("body1", makeFontSpecs(null, 16, 0.5));
         result.putMap("body2", makeFontSpecs(null, 14, 0.25));
-        result.putMap("button", makeFontSpecs("-medium", 14, 0.75));
+        result.putMap("button", makeFontSpecs("-medium", 14, 0.75, true));
         result.putMap("caption", makeFontSpecs(null, 12, 0.4));
-        result.putMap("overline", makeFontSpecs(null, 10, 1.5));
+        result.putMap("overline", makeFontSpecs(null, 10, 1.5, true));
 
         promise.resolve(result);
     }
@@ -382,7 +378,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
      * @param letterSpacing Sugest this to user
      * @return map with specs
      */
-    private WritableMap makeFontSpecs(String suffix, int fontSize, double letterSpacing) {
+    private WritableMap makeFontSpecs(String suffix, int fontSize, double letterSpacing, boolean upcase) {
         final WritableMap map = Arguments.createMap();
         final String roboto = "sans-serif";
 
@@ -394,7 +390,15 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             map.putDouble("letterSpacing", letterSpacing);
         }
 
+        if (upcase && RNTextSizeConf.supportUpperCaseTransform()) {
+            map.putString("textTransform", "uppercase");
+        }
+
         return map;
+    }
+
+    private WritableMap makeFontSpecs(String suffix, int fontSize, double letterSpacing) {
+        return makeFontSpecs(suffix, fontSize, letterSpacing, false);
     }
 
     @NonNull

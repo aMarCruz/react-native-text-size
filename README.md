@@ -43,12 +43,14 @@ yarn add react-native-text-size
 react-native link react-native-text-size
 ```
 
+Change the `compile` directive to `implementation` in the dependencies block of the android/app/build.gradle file.
+
 **Requirements:**
 
-- React Native v0.52 to v0.56.
+- React Native v0.57 or later.
 - Android API 16 or iOS 9.0 and above.
 
-If you are using Gradle 4 or later, don't forget to change the `compile` directive to `implementation` in the dependencies block of the android/app/build.gradle file.
+For versions prior to 0.56 of React Native, please use react-native-text-size v2.1.0
 
 See [Manual Installation][2] on the Wiki as an alternative if you have problems with automatic installation.
 
@@ -95,7 +97,7 @@ fontSize           | number  | 14       | The default font size comes from RN.
 fontStyle          | string  | 'normal' | One of "normal" or "italic".
 fontVariant        | array   | (none)   | _iOS only_
 allowFontScaling   | boolean | true     | To respect the user' setting of large fonts (i.e. use SP units).
-letterSpacing      | number  | (none)   | Additional spacing between characters (aka `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+ and RN 0.55+_
+letterSpacing      | number  | (none)   | Additional spacing between characters (aka `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+_
 includeFontPadding | boolean | true     | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
 textBreakStrategy  | string  | 'highQuality' | One of 'simple', 'balanced', or 'highQuality'.<br>_Android only, with API 23+_
 width              | number  | MAX_INT  | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
@@ -382,7 +384,7 @@ Thanks for your support!
 
 The [BSD 2-Clause](LICENSE) "Simplified" License.
 
-&copy; 2018, Alberto Martínez. All rights reserved.
+&copy; 2018-2019, Alberto Martínez. All rights reserved.
 
 [npm-badge]:      https://img.shields.io/npm/v/react-native-text-size.svg
 [npm-url]:        https://www.npmjs.com/package/react-native-text-size

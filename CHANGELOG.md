@@ -2,7 +2,23 @@
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## \[2.1.0] - 2019-01-10
+## \[3.0.0] - 2019-01-10
+
+### Added
+
+- Support `textTransform:uppercase` for specsForTextStyles in Android.
+
+### Changed
+
+- peerDependency on react-native to >=57.0
+- Update gradle files to be consistent with RN 0.57
+- Update License year.
+
+### Removed
+
+- Unused 'example' directory.
+
+## \[2.1.1] - 2019-01-10
 
 ### Added
 

@@ -8,21 +8,18 @@ def safeExtGet(prop, fallback) {
     return rootProject.ext.hasProperty(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-def _buildToolsVersion  = safeExtGet('buildToolsVersion', '26.0.3')
-def _compileSdkVersion  = safeExtGet('compileSdkVersion', 26)
+def _buildToolsVersion  = safeExtGet('buildToolsVersion', '27.0.3')
+def _compileSdkVersion  = safeExtGet('compileSdkVersion', 27)
 def _targetSdkVersion   = safeExtGet('targetSdkVersion', 26)
 def _minSdkVersion      = safeExtGet('minSdkVersion', 16)
 
 buildscript {
     repositories {
-        maven {
-            url 'https://maven.google.com/'
-            name 'google'
-        }
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.1.4'
     }
 }
 
@@ -35,43 +32,30 @@ android {
     defaultConfig {
         minSdkVersion _minSdkVersion
         targetSdkVersion _targetSdkVersion
-        versionCode 2
+        versionCode 3
         versionName getPackageVersion()
     }
     lintOptions {
         abortOnError false
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
 }
 
 repositories {
     mavenLocal()
+    google()
+    jcenter()
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
         url "$rootDir/../node_modules/react-native/android"
-        name 'React Native (local)'
     }
-    maven {
-        url 'https://maven.google.com/'
-        name 'google'
-    }
-    jcenter()
 }
 
 dependencies {
-    compile 'com.facebook.react:react-native:+'
+    compileOnly 'com.facebook.react:react-native:+'
 }
 
 task customClean(type: Delete) {
     delete rootProject.buildDir
 }
-clean.dependsOn customClean
 
-//gradle.projectsEvaluated {
-//    tasks.withType(JavaCompile) {
-//        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-//    }
-//}
+clean.dependsOn customClean

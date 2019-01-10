@@ -56,6 +56,10 @@ final class RNTextSizeConf {
         return reactNativeVersion >= 55;
     }
 
+    static boolean supportUpperCaseTransform() {
+        return reactNativeVersion >= 57;
+    }
+
     private final ReadableMap mOpts;
     private final boolean allowFontScaling;
 
