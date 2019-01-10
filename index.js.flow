@@ -97,24 +97,77 @@ export type TSHeightsParams = TSFontSpecs & {
 }
 
 export type TSMeasureParams = TSFontSpecs & {
-  /** The required text to measure. */
+  /**
+   * This is the only required parameter and may include _emojis_ or be empty,
+   * but it **must not be** `null`.
+   *
+   * If this is an empty string the resulting `width` will be zero.
+   */
   text: string,
-  /** Maximum width of the area to display the text. @default MAX_INT */
-  width?: number,
-  /** @default true */
+  /**
+   * To respect the user' setting of large fonts (i.e. use SP units).
+   * @default true
+   */
   allowFontScaling?: boolean,
-  /** Request an exact width calculation. For Android, iOS always do this. */
-  usePreciseWidth?: boolean;
-  /** Request line end character index for the given line number - Android only **/
-  lineEnd?: number;
+  /**
+   * Restrict the width. The resulting height will vary depending on the
+   * automatic flow of the text.
+   * @default MAX_INT
+   */
+  width?: number,
+  /**
+   * If `true`, the result will include an exact `width` and the
+   * `lastLineWidth` property.
+   * @default false
+   */
+  usePreciseWidth?: boolean,
+  /**
+   * If `>=0`, the result will include a `lineInfo` property with information
+   * for the required line number.
+   */
+  lineInfoForLine?: number,
 }
 
 export interface TSMeasureResult {
+  /**
+   * Total used width. It may be less or equal to the `width` option.
+   *
+   * On Android, this value may vary depending on the `usePreciseWidth` flag.
+   */
   width: number;
+  /**
+   * Total height, including top and bottom padding if `includingFontPadding`
+   * was set (the default).
+   */
   height: number;
+  /**
+   * Width of the last line, without trailing blanks.
+   *
+   * If `usePreciseWidth` is `false` (the default), this field is undefined.
+   */
   lastLineWidth?: number;
+  /**
+   * Number of lines, taking into account hard and automatic line breaks.
+   */
   lineCount: number;
-  lineEndForLineNo?: number;
+  /**
+   * Line information, if the `lineInfoForLine` option is given.
+   */
+  lineInfo?: {
+    /** Line number of this info, base 0.
+     *
+     * It can be less than the requested line number if `lineInfoForLine` is out of range.
+     */
+    line: number;
+    /** Text offset of the beginning of this line. */
+    start: number;
+    /** Text offset after the last _visible_ character (so whitespace is not counted) on this line. */
+    end: number;
+    /** The vertical position of the bottom of this line, including padding. */
+    bottom: number;
+    /** Horizontal extent of this line, including leading margin indent, but excluding trailing whitespace. */
+    width: number;
+  }
 }
 
 declare interface TextSizeStatic {

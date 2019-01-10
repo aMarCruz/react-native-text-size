@@ -35,7 +35,6 @@ final class RNTextSizeConf {
         reactNativeVersion = version;
     }
 
-
     /**
      * Make a Typeface from the supplied font family and style.
      */

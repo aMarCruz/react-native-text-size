@@ -140,7 +140,6 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             final int lineCount = layout.getLineCount();
             float rectWidth;
 
-            // go more faster?
             if (conf.getBooleanOrTrue("usePreciseWidth")) {
                 float lastWidth = 0f;
                 // Layout.getWidth() returns the configured max width, we must
@@ -161,9 +160,16 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             result.putDouble("height", layout.getHeight() / density);
             result.putInt("lineCount", lineCount);
 
-            Integer lineEndForLineNo = conf.getIntOrNull("lineEndForLineNo");
-            if (lineEndForLineNo != null) {
-                result.putInt("lineEnd", layout.getLineVisibleEnd(lineEndForLineNo));
+            Integer lineInfoForLine = conf.getIntOrNull("lineInfoForLine");
+            if (lineInfoForLine != null && lineInfoForLine >= 0) {
+                final int line = Math.max(lineInfoForLine, lineCount);
+                final WritableMap info = Arguments.createMap();
+                info.putInt("line", line);
+                info.putInt("start", layout.getLineStart(line));
+                info.putInt("end", layout.getLineVisibleEnd(line));
+                info.putDouble("bottom", layout.getLineBottom(line) / density);
+                info.putDouble("width", layout.getLineMax(line) / density);
+                result.putMap("lineInfo", info);
             }
 
             promise.resolve(result);
@@ -332,8 +338,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * TODO:
-     * Maybe some day?
+     * Android does not have font name info.
      */
     @SuppressWarnings("unused")
     @ReactMethod
@@ -446,8 +451,10 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
                 try {
                     String[] list = assetManager.list(FONTS_ASSET_PATH);
 
-                    for (String spec : list) {
-                        addFamilyToArray(tmpArr, spec);
+                    if (list != null) {
+                        for (String spec : list) {
+                            addFamilyToArray(tmpArr, spec);
+                        }
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
