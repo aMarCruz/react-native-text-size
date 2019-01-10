@@ -29,12 +29,6 @@ static inline CGFloat CGFloatValueFrom(NSNumber * _Nullable num) {
 #endif
 }
 
-#if CGFLOAT_IS_DOUBLE
-#define CGRound round
-#else
-#define CGRound roundf
-#endif
-
 #define A_SIZE(x) (sizeof (x)/sizeof (x)[0])
 
 /*
@@ -123,25 +117,31 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
   const CGFloat epsilon = 0.001;
   const CGFloat width = MIN(RCTCeilPixelValue(size.width + epsilon), maxSize.width);
   const CGFloat height = MIN(RCTCeilPixelValue(size.height + epsilon), maxSize.height);
-  const CGFloat lineCount = CGRound(size.height / (font.lineHeight + font.leading));
+  const NSInteger lineCount = [self getLineCount:layoutManager];
+
+  NSMutableDictionary *result = [[NSMutableDictionary alloc]
+                                 initWithObjectsAndKeys:@(width), @"width",
+                                 @(height), @"height",
+                                 @(lineCount), @"lineCount",
+                                 nil];
 
   if ([options[@"usePreciseWidth"] boolValue]) {
     const CGFloat lastIndex = layoutManager.numberOfGlyphs - 1;
     const CGSize lastSize = [layoutManager lineFragmentUsedRectForGlyphAtIndex:lastIndex
                                                                 effectiveRange:nil].size;
-    resolve(@{
-              @"width": @(width),
-              @"height": @(height),
-              @"lastLineWidth": @(lastSize.width),
-              @"lineCount": @(lineCount),
-              });
-  } else {
-    resolve(@{
-              @"width": @(width),
-              @"height": @(height),
-              @"lineCount": @(lineCount),
-              });
+    [result setValue:@(lastSize.width) forKey:@"lastLineWidth"];
   }
+
+  const CGFloat optLine = CGFloatValueFrom(options[@"lineInfoForLine"]);
+  if (!isnan(optLine) && optLine >= 0) {
+    const NSInteger line = MIN((NSInteger) optLine, lineCount);
+    NSDictionary *lineInfo = [self getLineInfo:layoutManager str:text lineNo:line];
+    if (lineInfo) {
+      [result setValue:lineInfo forKey:@"lineInfo"];
+    }
+  }
+
+  resolve(result);
 }
 
 /**
@@ -370,6 +370,66 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 //  Non-exposed instance & static methods
 // ============================================================================
 //
+
+/**
+ * Get extended info for a given line number.
+ * @since v2.1.0
+ */
+- (NSInteger)getLineCount:(NSLayoutManager *)layoutManager {
+  NSRange lineRange;
+  NSUInteger glyphCount = layoutManager.numberOfGlyphs;
+  NSInteger lineCount = 0;
+
+  for (NSUInteger index = 0; index < glyphCount; lineCount++) {
+    [layoutManager
+     lineFragmentUsedRectForGlyphAtIndex:index effectiveRange:&lineRange withoutAdditionalLayout:YES];
+    index = NSMaxRange(lineRange);
+  }
+
+  return lineCount;
+}
+
+/**
+ * Get extended info for a given line number.
+ * @since v2.1.0
+ */
+- (NSDictionary *)getLineInfo:(NSLayoutManager *)layoutManager str:(NSString *)str lineNo:(NSInteger)line {
+  CGRect lineRect = CGRectZero;
+  NSRange lineRange;
+  NSUInteger glyphCount = layoutManager.numberOfGlyphs;
+  NSInteger lineCount = 0;
+
+  for (NSUInteger index = 0; index < glyphCount; lineCount++) {
+    lineRect = [layoutManager
+                lineFragmentUsedRectForGlyphAtIndex:index
+                effectiveRange:&lineRange
+                withoutAdditionalLayout:YES];
+    index = NSMaxRange(lineRange);
+
+    if (line == lineCount) {
+      NSCharacterSet *ws = NSCharacterSet.whitespaceAndNewlineCharacterSet;
+      NSRange charRange = [layoutManager characterRangeForGlyphRange:lineRange actualGlyphRange:nil];
+      NSUInteger start = charRange.location;
+      index = NSMaxRange(charRange);
+      /*
+        Get the trimmed range of chars for the glyph range, to be consistent
+        w/android, but the width here will include the trailing whitespace.
+      */
+      while (index > start && [ws characterIsMember:[str characterAtIndex:index - 1]]) {
+        index--;
+      }
+      return @{
+               @"line": @(line),
+               @"start": @(start),
+               @"end": @(index),
+               @"bottom": @(lineRect.origin.y + lineRect.size.height),
+               @"width": @(lineRect.size.width)
+               };
+    }
+  }
+
+  return nil;
+}
 
 /**
  * Create a scaled font based on the given specs.
