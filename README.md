@@ -233,6 +233,59 @@ The result is a Promise that resolves to an array with the height of each block 
 
 Unlike measure, `null` elements returns 0 without generating error, and empty strings returns the same height that RN assigns to empty `<Text>` components (the difference of the result between `null` and empty is intentional).
 
+### Example
+
+```jsx
+//...
+import rnTextSize, { TSFontSpecs } from 'react-native-text-size'
+
+type Props = {}
+type State = { heights: number[] }
+
+// On iOS 9+ will show 'San Francisco' and 'Roboto' on Android
+const fontSpecs: TSFontSpecs = {
+  fontFamily = undefined,
+  fontSize = 24,
+  fontStyle = 'italic',
+  fontWeight = 'bold',
+}
+const texts = ['I ❤️ rnTextSize', 'I ❤️ rnTextSize using flatHeights', 'Thx for flatHeights']
+
+class Test extends Component<Props, State> {
+  state = {
+    heights: [],
+  }
+
+  async componentDidMount() {
+    const width = Dimensions.get('window').width * 0.8
+    const heights = await rnTextSize.flatHeights({
+      text: texts,      // array of texts to measure, can include symbols
+      width,            // max-width of the "virtual" container
+      ...fontSpecs,     // RN font specification
+    })
+    this.setState({
+      heights
+    })
+  }
+
+  render() {
+    const { heights } = this.state
+    
+    return (
+      <View style={{ padding: 12 }}>
+        {texts.map(
+          (text, index) => (
+            <Text style={{ height: heights[index], ...fontSpecs }}>
+              {text}
+            </Text>
+          )
+        )}
+      </View>
+    )
+  }
+}
+```
+
 ## specsForTextStyles
 
 ```ts
