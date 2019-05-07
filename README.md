@@ -239,7 +239,7 @@ Unlike measure, `null` elements returns 0 without generating error, and empty st
 //...
 import rnTextSize, { TSFontSpecs } from 'react-native-text-size'
 
-type Props = {}
+type Props = { texts: string[] }
 type State = { heights: number[] }
 
 // On iOS 9+ will show 'San Francisco' and 'Roboto' on Android
@@ -257,6 +257,7 @@ class Test extends Component<Props, State> {
   }
 
   async componentDidMount() {
+    const { texts } = this.props
     const width = Dimensions.get('window').width * 0.8
     const heights = await rnTextSize.flatHeights({
       text: texts,      // array of texts to measure, can include symbols
@@ -269,6 +270,7 @@ class Test extends Component<Props, State> {
   }
 
   render() {
+    const { texts } = this.props
     const { heights } = this.state
     
     return (
