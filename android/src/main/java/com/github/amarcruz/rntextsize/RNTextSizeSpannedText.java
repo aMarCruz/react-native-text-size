@@ -3,7 +3,6 @@ package com.github.amarcruz.rntextsize;
 import android.annotation.TargetApi;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.text.Spannable;
 import android.text.TextPaint;
 import android.text.style.AbsoluteSizeSpan;
@@ -11,14 +10,16 @@ import android.text.style.MetricAffectingSpan;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 
+import javax.annotation.Nonnull;
+
 final class RNTextSizeSpannedText {
 
     RNTextSizeSpannedText() {}
 
     static Spannable spannedFromSpecsAndText(
-            @NonNull final ReactApplicationContext context,
-            @NonNull final RNTextSizeConf conf,
-            @NonNull final Spannable text
+            @Nonnull final ReactApplicationContext context,
+            @Nonnull final RNTextSizeConf conf,
+            @Nonnull final Spannable text
     ) {
 
         //final SpannableString str = new SpannableString(text);
@@ -87,7 +88,7 @@ final class RNTextSizeSpannedText {
         }
 
         @Override
-        public void updateMeasureState(TextPaint paint) {
+        public void updateMeasureState(@Nonnull TextPaint paint) {
             apply(paint);
         }
 
@@ -114,7 +115,7 @@ final class RNTextSizeSpannedText {
         }
 
         @Override
-        public void updateMeasureState(TextPaint paint) {
+        public void updateMeasureState(@Nonnull TextPaint paint) {
             apply(paint, mTypeface);
         }
 

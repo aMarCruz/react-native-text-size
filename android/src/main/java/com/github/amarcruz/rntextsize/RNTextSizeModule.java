@@ -4,8 +4,6 @@ import android.content.res.AssetManager;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.SpannableString;
@@ -29,6 +27,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 class RNTextSizeModule extends ReactContextBaseJavaModule {
     private static final String TAG = "RNTextSize";
@@ -401,11 +402,11 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
         return makeFontSpecs(suffix, fontSize, letterSpacing, false);
     }
 
-    @NonNull
+    @Nonnull
     private WritableMap fontInfoFromTypeface(
-            @NonNull final TextPaint textPaint,
-            @NonNull final Typeface typeface,
-            @NonNull final RNTextSizeConf conf
+            @Nonnull final TextPaint textPaint,
+            @Nonnull final Typeface typeface,
+            @Nonnull final RNTextSizeConf conf
     ) {
         // Info is always in unscaled values
         final float density = getCurrentDensity();
@@ -444,7 +445,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
      * Set the font names in assets/fonts into the target array.
      * @param destArr Target
      */
-    private void getFontsInAssets(@NonNull WritableArray destArr) {
+    private void getFontsInAssets(@Nonnull WritableArray destArr) {
         String[] srcArr = fontsInAssets;
 
         if (srcArr == null) {
@@ -475,8 +476,8 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
     }
 
     private void addFamilyToArray(
-            @NonNull final List<String> outArr,
-            @NonNull final String spec
+            @Nonnull final List<String> outArr,
+            @Nonnull final String spec
     ) {
         for (String ext : FILE_EXTENSIONS) {
             if (spec.endsWith(ext)) {

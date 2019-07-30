@@ -1,6 +1,6 @@
 {
   "name": "react-native-text-size",
-  "version": "3.0.0",
+  "version": "4.0.0-rc.1",
   "description": "Measure text accurately before laying it out and get font information from your App",
   "main": "index.js",
   "keywords": [
@@ -25,6 +25,6 @@
     "clean": "rm -rf $TMPDIR/react-* && watchman watch-del-all && cd android && ./gradlew clean"
   },
   "peerDependencies": {
-    "react-native": ">=0.57.0"
+    "react-native": ">=0.59.0"
   }
 }

@@ -2,8 +2,6 @@ package com.github.amarcruz.rntextsize;
 
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.util.Log;
 
@@ -16,6 +14,9 @@ import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.views.text.ReactFontManager;
 
 import java.util.Map;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @SuppressWarnings("SameParameterValue")
 final class RNTextSizeConf {
@@ -38,9 +39,9 @@ final class RNTextSizeConf {
     /**
      * Make a Typeface from the supplied font family and style.
      */
-    @NonNull
+    @Nonnull
     static Typeface getFont(
-            @NonNull final ReactApplicationContext context,
+            @Nonnull final ReactApplicationContext context,
             @Nullable String family,
             final int style
     ) {
@@ -76,7 +77,7 @@ final class RNTextSizeConf {
      * @param options User options
      * @param forText This will be used for measure text?
      */
-    RNTextSizeConf(@NonNull final ReadableMap options, final boolean forText) {
+    RNTextSizeConf(@Nonnull final ReadableMap options, final boolean forText) {
         mOpts = options;
 
         allowFontScaling = forText && getBooleanOrTrue("allowFontScaling");
@@ -89,27 +90,27 @@ final class RNTextSizeConf {
         letterSpacing = supportLetterSpacing() ? getFloatOrNaN("letterSpacing") : Float.NaN;
     }
 
-    boolean has(@NonNull final String name) {
+    boolean has(@Nonnull final String name) {
         return mOpts.hasKey(name);
     }
 
-    boolean getBooleanOrTrue(@NonNull final String name) {
+    boolean getBooleanOrTrue(@Nonnull final String name) {
         return !mOpts.hasKey(name) || mOpts.getBoolean(name);
     }
 
-    Integer getIntOrNull(@NonNull final String name) {
+    Integer getIntOrNull(@Nonnull final String name) {
         return mOpts.hasKey(name)
                 ? mOpts.getInt(name) : null;
     }
 
     @Nullable
-    String getString(@NonNull final String name) {
+    String getString(@Nonnull final String name) {
         return mOpts.hasKey(name)
                 ? mOpts.getString(name) : null;
     }
 
     @Nullable
-    ReadableArray getArray(@NonNull final String name) {
+    ReadableArray getArray(@Nonnull final String name) {
         return mOpts.hasKey(name) && mOpts.getType(name) == ReadableType.Array
                 ? mOpts.getArray(name) : null;
     }
@@ -152,7 +153,7 @@ final class RNTextSizeConf {
         return Layout.BREAK_STRATEGY_HIGH_QUALITY;
     }
 
-    private float getFloatOrNaN(@NonNull final String name) {
+    private float getFloatOrNaN(@Nonnull final String name) {
         return mOpts.hasKey(name) ? (float) mOpts.getDouble(name) : Float.NaN;
     }
 
