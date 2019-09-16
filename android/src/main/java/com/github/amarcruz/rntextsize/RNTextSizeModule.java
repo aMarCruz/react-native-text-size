@@ -31,7 +31,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-class RNTextSizeModule extends ReactContextBaseJavaModule {
+public class RNTextSizeModule extends ReactContextBaseJavaModule {
     private static final String TAG = "RNTextSize";
     private static final float SPACING_ADDITION = 0f;
     private static final float SPACING_MULTIPLIER = 1f;
