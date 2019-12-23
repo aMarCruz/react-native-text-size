@@ -1,0 +1,9 @@
+*/project.xcworkspace/
+*/xcuserdata/
+.DS_Store
+.npmignore
+Pods/
+build/
+DerivedData
+*.xccheckout
+*.xcuserstate
