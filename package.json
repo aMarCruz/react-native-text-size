@@ -3,6 +3,12 @@
   "version": "4.0.0-rc.1",
   "description": "Measure text accurately before laying it out and get font information from your App",
   "main": "index.js",
+  "files": [
+    "android/",
+	"ios/",
+	"index.d.ts",
+	"index.js.flow"
+  ],
   "keywords": [
     "react-native",
     "measure",
