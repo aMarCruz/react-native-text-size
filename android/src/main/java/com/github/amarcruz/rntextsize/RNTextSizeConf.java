@@ -67,6 +67,7 @@ final class RNTextSizeConf {
     final String fontFamily;
     final float fontSize;
     final int fontStyle;
+    final float lineHeight;
     final boolean includeFontPadding;
     final float letterSpacing;
     final @Nullable Integer numberOfLines;
@@ -85,6 +86,7 @@ final class RNTextSizeConf {
         fontFamily = getString("fontFamily");
         fontSize = getFontSizeOrDefault();
         fontStyle = getFontStyle();
+        lineHeight = getFloatOrNaN("lineHeight");
         includeFontPadding = forText && getBooleanOrTrue("includeFontPadding");
 
         // letterSpacing is supported in RN 0.55+
