@@ -86,25 +86,15 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
     return;
   }
 
-  // Allow the user to specify the width or height (both optionals).
-  const CGFloat optWidth = CGFloatValueFrom(options[@"width"]);
-  const CGFloat maxWidth = isnan(optWidth) || isinf(optWidth) ? CGFLOAT_MAX : optWidth;
-  const CGSize maxSize = CGSizeMake(maxWidth, CGFLOAT_MAX);
-
-  // Create attributes for the font and the optional letter spacing.
+  const CGSize maxSize = [self maxSizeFromOptions:options];
   const CGFloat letterSpacing = CGFloatValueFrom(options[@"letterSpacing"]);
-  NSDictionary<NSAttributedStringKey,id> *const attributes = isnan(letterSpacing)
-  ? @{NSFontAttributeName: font}
-  : @{NSFontAttributeName: font, NSKernAttributeName: @(letterSpacing)};
 
-  NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:maxSize];
-  textContainer.lineFragmentPadding = 0.0;
-  textContainer.lineBreakMode = NSLineBreakByClipping;
-
-  const NSInteger numberOfLines = [RCTConvert NSInteger:options[@"numberOfLines"]];
-  if (numberOfLines > 0) {
-    textContainer.maximumNumberOfLines = numberOfLines;
-  }
+  NSTextContainer *const textContainer =
+    [self textContainerFromOptions:options withMaxSize:maxSize];
+  NSDictionary<NSAttributedStringKey,id> *const attributes =
+    [self textStorageAttributesFromOptions:options
+                                  withFont:font
+                         withLetterSpacing:letterSpacing];
 
   NSLayoutManager *layoutManager = [NSLayoutManager new];
   [layoutManager addTextContainer:textContainer];
@@ -171,24 +161,15 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
     return;
   }
 
-  const CGFloat optWidth = CGFloatValueFrom(options[@"width"]);
-  const CGFloat maxWidth = isnan(optWidth) || isinf(optWidth) ? CGFLOAT_MAX : optWidth;
-  const CGSize maxSize = CGSizeMake(maxWidth, CGFLOAT_MAX);
-
-  // Create attributes for the font and the optional letter spacing.
+  const CGSize maxSize = [self maxSizeFromOptions:options];
   const CGFloat letterSpacing = CGFloatValueFrom(options[@"letterSpacing"]);
-  NSDictionary<NSAttributedStringKey,id> *const attributes = isnan(letterSpacing)
-  ? @{NSFontAttributeName: font}
-  : @{NSFontAttributeName: font, NSKernAttributeName: @(letterSpacing)};
 
-  NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:maxSize];
-  textContainer.lineFragmentPadding = 0.0;
-  textContainer.lineBreakMode = NSLineBreakByClipping;
-
-  const NSInteger numberOfLines = [RCTConvert NSInteger:options[@"numberOfLines"]];
-  if (numberOfLines > 0) {
-    textContainer.maximumNumberOfLines = numberOfLines;
-  }
+  NSTextContainer *const textContainer =
+    [self textContainerFromOptions:options withMaxSize:maxSize];
+  NSDictionary<NSAttributedStringKey,id> *const attributes =
+    [self textStorageAttributesFromOptions:options
+                                  withFont:font
+                         withLetterSpacing:letterSpacing];
 
   NSLayoutManager *layoutManager = [NSLayoutManager new];
   [layoutManager addTextContainer:textContainer];
@@ -506,7 +487,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * of the weight in multiples of "100", as expected by RN, or one of the words
  * "bold" or "normal" if appropiate.
  *
- * @param trais NSDictionary with the traits of the font.
+ * @param traits NSDictionary with the traits of the font.
  * @return NSString with the weight of the font.
  */
 - (NSString *)fontWeightFromTraits:(const NSDictionary *)traits
@@ -527,7 +508,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 /**
  * Returns a string with the style found in the trait, either "normal" or "italic".
  *
- * @param trais NSDictionary with the traits of the font.
+ * @param traits NSDictionary with the traits of the font.
  * @return NSString with the style.
  */
 - (NSString *)fontStyleFromTraits:(const NSDictionary *)traits
@@ -589,6 +570,58 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 
   // Returns an array only if found variants, to preserve memory
   return count ? [NSArray arrayWithObjects:outArr count:count] : nil;
+}
+
+- (CGSize)maxSizeFromOptions:(NSDictionary * _Nullable)options
+{
+  const CGFloat optWidth = CGFloatValueFrom(options[@"width"]);
+  const CGFloat maxWidth = isnan(optWidth) || isinf(optWidth) ? CGFLOAT_MAX : optWidth;
+  const CGSize maxSize = CGSizeMake(maxWidth, CGFLOAT_MAX);
+  return maxSize;
+}
+
+/**
+ * Creates a textContainer with the width and numberOfLines from options.
+ */
+- (NSTextContainer *)textContainerFromOptions:(NSDictionary * _Nullable)options
+                                  withMaxSize:(CGSize)maxSize
+{
+  NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:maxSize];
+  textContainer.lineFragmentPadding = 0.0;
+  textContainer.lineBreakMode = NSLineBreakByClipping;
+
+  const NSInteger numberOfLines = [RCTConvert NSInteger:options[@"numberOfLines"]];
+  if (numberOfLines > 0) {
+    textContainer.maximumNumberOfLines = numberOfLines;
+  }
+
+  return textContainer;
+}
+
+/**
+ * Creates attributes that should be passed into the TextStorage based on
+ * parameters and the options the user passes in.
+ */
+- (NSDictionary<NSAttributedStringKey,id> *const)textStorageAttributesFromOptions:(NSDictionary * _Nullable)options
+                                                              withFont:(UIFont *const _Nullable)font
+                                                     withLetterSpacing:(CGFloat)letterSpacing
+{
+  NSMutableDictionary<NSAttributedStringKey,id> *const attributes = [[NSMutableDictionary alloc] init];
+  [attributes setObject:font forKey:NSFontAttributeName];
+
+  if (!isnan(letterSpacing)) {
+    [attributes setObject:@(letterSpacing) forKey:NSKernAttributeName];
+  }
+
+  const CGFloat lineHeight = CGFloatValueFrom(options[@"lineHeight"]);
+  if (!isnan(lineHeight)) {
+    NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
+    [style setMinimumLineHeight:lineHeight];
+    [style setMaximumLineHeight:lineHeight];
+    [attributes setObject:style forKey:NSParagraphStyleAttributeName];
+  }
+
+  return attributes;
 }
 
 @end

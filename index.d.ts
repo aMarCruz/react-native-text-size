@@ -64,6 +64,12 @@ declare module "react-native-text-size" {
     fontSize?: number;
     fontStyle?: TSFontStyle;
     fontWeight?: TSFontWeight;
+    lineHeight?: number;
+    /**
+     * Number of lines to limit the text to. Corresponds to the `numberOfLines`
+     * prop on `<Text>`
+     */
+    numberOfLines?: number;
     /** @platform ios */
     fontVariant?: Array<TSFontVariant>;
     /** iOS all, Android SDK 21+ with RN 0.55+ */
@@ -72,8 +78,6 @@ declare module "react-native-text-size" {
     includeFontPadding?: boolean;
     /** @platform android (SDK 23+) */
     textBreakStrategy?: TSTextBreakStrategy;
-    /** Number of lines to limit the text to */
-    numberOfLines?: number;
   }
 
   export type TSFontForStyle = {

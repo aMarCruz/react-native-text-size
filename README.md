@@ -23,12 +23,13 @@ In both functions, the text to be measured is required, but the rest of the para
 - `fontSize`
 - `fontWeight`
 - `fontStyle`
+- `lineHeight`
+- `numberOfLines`
 - `fontVariant` (iOS)
 - `includeFontPadding` (Android)
 - `textBreakStrategy` (Android)
 - `letterSpacing`
 - `allowFontScaling`
-- `numberOfLines`
 - `width`: Constraint for automatic line-break based on text-break strategy.
 
 In addition, the library includes functions to obtain information about the fonts visible to the App.
@@ -96,12 +97,13 @@ fontFamily         | string  | OS dependent | The default is the same applied by
 fontWeight         | string  | 'normal' | On android, numeric ranges has no granularity and '500' to '900' becomes 'bold', but you can use a `fontFamily` of specific weight ("sans-serif-thin", "sans-serif-medium", etc).
 fontSize           | number  | 14       | The default font size comes from RN.
 fontStyle          | string  | 'normal' | One of "normal" or "italic".
+lineHeight         | number  | (none)   | The line height of each line. Defaults to the font size.
+numberOfLines      | number  | (none)   | Limit the number of lines the text can render on
 fontVariant        | array   | (none)   | _iOS only_
 allowFontScaling   | boolean | true     | To respect the user' setting of large fonts (i.e. use SP units).
 letterSpacing      | number  | (none)   | Additional spacing between characters (aka `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+_
 includeFontPadding | boolean | true     | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
 textBreakStrategy  | string  | 'highQuality' | One of 'simple', 'balanced', or 'highQuality'.<br>_Android only, with API 23+_
-numberOfLines      | number  | (none)   | Limit the number of lines the text can render on
 width              | number  | MAX_INT  | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
 usePreciseWidth    | boolean | false    | If `true`, the result will include an exact `width` and the `lastLineWidth` property.<br>You can see the effect of this flag in the [sample App][sample-app].
 lineInfoForLine    | number  | (none)   | If `>=0`, the result will include a [lineInfo](#lineinfo) property with information for the required line number.
