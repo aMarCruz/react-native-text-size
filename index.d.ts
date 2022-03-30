@@ -72,6 +72,8 @@ declare module "react-native-text-size" {
     includeFontPadding?: boolean;
     /** @platform android (SDK 23+) */
     textBreakStrategy?: TSTextBreakStrategy;
+    /** Number of lines to limit the text to */
+    numberOfLines?: number;
   }
 
   export type TSFontForStyle = {

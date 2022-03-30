@@ -28,6 +28,7 @@ In both functions, the text to be measured is required, but the rest of the para
 - `textBreakStrategy` (Android)
 - `letterSpacing`
 - `allowFontScaling`
+- `numberOfLines`
 - `width`: Constraint for automatic line-break based on text-break strategy.
 
 In addition, the library includes functions to obtain information about the fonts visible to the App.
@@ -100,6 +101,7 @@ allowFontScaling   | boolean | true     | To respect the user' setting of large 
 letterSpacing      | number  | (none)   | Additional spacing between characters (aka `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+_
 includeFontPadding | boolean | true     | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
 textBreakStrategy  | string  | 'highQuality' | One of 'simple', 'balanced', or 'highQuality'.<br>_Android only, with API 23+_
+numberOfLines      | number  | (none)   | Limit the number of lines the text can render on
 width              | number  | MAX_INT  | Restrict the width. The resulting height will vary depending on the automatic flow of the text.
 usePreciseWidth    | boolean | false    | If `true`, the result will include an exact `width` and the `lastLineWidth` property.<br>You can see the effect of this flag in the [sample App][sample-app].
 lineInfoForLine    | number  | (none)   | If `>=0`, the result will include a [lineInfo](#lineinfo) property with information for the required line number.
@@ -228,6 +230,7 @@ allowFontScaling    | boolean  | true
 letterSpacing       | number   | (none)
 includeFontPadding  | boolean  | true
 textBreakStrategy   | string   | 'highQuality'
+numberOfLines       | number   | (none)
 
 The result is a Promise that resolves to an array with the height of each block (in _SP_), in the same order in which the blocks were received.
 

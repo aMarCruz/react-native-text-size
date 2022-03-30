@@ -6,8 +6,8 @@
 #import <React/RCTUtils.h>
 #else
 #import "React/RCTConvert.h"   // Required when used as a Pod in a Swift project
-#import "React/RCTFont.h"
-#import "React/RCTUtils.h"
+#import <React/RCTFont.h>
+#import <React/RCTUtils.h>
 #endif
 
 #import <CoreText/CoreText.h>
@@ -99,7 +99,12 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
 
   NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:maxSize];
   textContainer.lineFragmentPadding = 0.0;
-  textContainer.lineBreakMode = NSLineBreakByClipping; // no maxlines support
+  textContainer.lineBreakMode = NSLineBreakByClipping;
+
+  const NSInteger numberOfLines = [RCTConvert NSInteger:options[@"numberOfLines"]];
+  if (numberOfLines > 0) {
+    textContainer.maximumNumberOfLines = numberOfLines;
+  }
 
   NSLayoutManager *layoutManager = [NSLayoutManager new];
   [layoutManager addTextContainer:textContainer];
@@ -178,7 +183,12 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
 
   NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:maxSize];
   textContainer.lineFragmentPadding = 0.0;
-  textContainer.lineBreakMode = NSLineBreakByClipping; // no maxlines support
+  textContainer.lineBreakMode = NSLineBreakByClipping;
+
+  const NSInteger numberOfLines = [RCTConvert NSInteger:options[@"numberOfLines"]];
+  if (numberOfLines > 0) {
+    textContainer.maximumNumberOfLines = numberOfLines;
+  }
 
   NSLayoutManager *layoutManager = [NSLayoutManager new];
   [layoutManager addTextContainer:textContainer];

@@ -10,6 +10,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -118,13 +119,17 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
             if (layout == null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    layout = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
+                    StaticLayout.Builder builder = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
                             .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                             .setBreakStrategy(conf.getTextBreakStrategy())
                             .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
                             .setIncludePad(includeFontPadding)
-                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
-                            .build();
+                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER);
+                    if (conf.numberOfLines != null) {
+                        builder = builder.setMaxLines(conf.numberOfLines)
+                                .setEllipsize(TextUtils.TruncateAt.END);
+                    }
+                    layout = builder.build();
                 } else {
                     layout = new StaticLayout(
                             text,
@@ -228,13 +233,17 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
                 sb.replace(0, sb.length(), text);
 
                 if (Build.VERSION.SDK_INT >= 23) {
-                    layout = StaticLayout.Builder.obtain(sb, 0, sb.length(), textPaint, (int) width)
+                    StaticLayout.Builder builder = StaticLayout.Builder.obtain(sb, 0, sb.length(), textPaint, (int) width)
                             .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                             .setBreakStrategy(textBreakStrategy)
                             .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
                             .setIncludePad(includeFontPadding)
-                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
-                            .build();
+                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER);
+                    if (conf.numberOfLines != null) {
+                        builder = builder.setMaxLines(conf.numberOfLines)
+                                .setEllipsize(TextUtils.TruncateAt.END);
+                    }
+                    layout = builder.build();
                 } else {
                     layout = new StaticLayout(
                             sb,
