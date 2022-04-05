@@ -6,8 +6,8 @@
 #import <React/RCTUtils.h>
 #else
 #import "React/RCTConvert.h"   // Required when used as a Pod in a Swift project
-#import <React/RCTFont.h>
-#import <React/RCTUtils.h>
+#import "React/RCTFont.h"
+#import "React/RCTUtils.h"
 #endif
 
 #import <CoreText/CoreText.h>
@@ -179,8 +179,9 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
 
   NSMutableArray<NSNumber *> *result = [[NSMutableArray alloc] initWithCapacity:texts.count];
 
-  const CGFloat scaleMultiplier = _bridge ? _bridge.accessibilityManager.multiplier : 1.0;
-  const CGFloat epsilon = scaleMultiplier != 1.0 ? 0.001 : 0;
+  // When there's no font scaling, adding epsilon offsets the calculation
+  // by a bit, and when there is, it's required. This was tested empirically.
+  const CGFloat epsilon = [self fontScaleMultiplier] != 1.0 ? 0.001 : 0;
 
   for (int ix = 0; ix < texts.count; ix++) {
     NSString *text = texts[ix];
@@ -618,13 +619,17 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
   const CGFloat lineHeight = CGFloatValueFrom(options[@"lineHeight"]);
   if (!isnan(lineHeight)) {
     NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
-    const CGFloat scaleMultiplier = _bridge ? _bridge.accessibilityManager.multiplier : 1.0;
+    const CGFloat scaleMultiplier = [self fontScaleMultiplier];
     [style setMinimumLineHeight:lineHeight * scaleMultiplier];
     [style setMaximumLineHeight:lineHeight * scaleMultiplier];
     [attributes setObject:style forKey:NSParagraphStyleAttributeName];
   }
 
   return attributes;
+}
+
+- (CGFloat)fontScaleMultiplier {
+  return _bridge ? _bridge.accessibilityManager.multiplier : 1.0;
 }
 
 @end
