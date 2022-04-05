@@ -178,7 +178,9 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
   [textStorage addLayoutManager:layoutManager];
 
   NSMutableArray<NSNumber *> *result = [[NSMutableArray alloc] initWithCapacity:texts.count];
-  const CGFloat epsilon = 0.001;
+
+  const CGFloat scaleMultiplier = _bridge ? _bridge.accessibilityManager.multiplier : 1.0;
+  const CGFloat epsilon = scaleMultiplier != 1.0 ? 0.001 : 0;
 
   for (int ix = 0; ix < texts.count; ix++) {
     NSString *text = texts[ix];
