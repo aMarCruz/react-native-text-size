@@ -616,8 +616,9 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
   const CGFloat lineHeight = CGFloatValueFrom(options[@"lineHeight"]);
   if (!isnan(lineHeight)) {
     NSMutableParagraphStyle *style = [[NSMutableParagraphStyle alloc] init];
-    [style setMinimumLineHeight:lineHeight];
-    [style setMaximumLineHeight:lineHeight];
+    const CGFloat scaleMultiplier = _bridge ? _bridge.accessibilityManager.multiplier : 1.0;
+    [style setMinimumLineHeight:lineHeight * scaleMultiplier];
+    [style setMaximumLineHeight:lineHeight * scaleMultiplier];
     [attributes setObject:style forKey:NSParagraphStyleAttributeName];
   }
 
