@@ -89,25 +89,26 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        final SpannableString text = (SpannableString) RNTextSizeSpannedText
-                .spannedFromSpecsAndText(mReactContext, conf, new SpannableString(_text));
+        final SpannableStringBuilder sb = new SpannableStringBuilder(_text);
+        RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
+
 
         final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
         Layout layout = null;
         try {
-            final BoringLayout.Metrics boring = BoringLayout.isBoring(text, textPaint);
+            final BoringLayout.Metrics boring = BoringLayout.isBoring(sb, textPaint);
             int hintWidth = (int) width;
 
             if (boring == null) {
                 // Not boring, ie. the text is multiline or contains unicode characters.
-                final float desiredWidth = Layout.getDesiredWidth(text, textPaint);
+                final float desiredWidth = Layout.getDesiredWidth(sb, textPaint);
                 if (desiredWidth <= width) {
                     hintWidth = (int) Math.ceil(desiredWidth);
                 }
             } else if (boring.width <= width) {
                 // Single-line and width unknown or bigger than the width of the text.
                 layout = BoringLayout.make(
-                        text,
+                        sb,
                         textPaint,
                         boring.width,
                         Layout.Alignment.ALIGN_NORMAL,
@@ -118,29 +119,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             }
 
             if (layout == null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    StaticLayout.Builder builder = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
-                            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-                            .setBreakStrategy(conf.getTextBreakStrategy())
-                            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
-                            .setIncludePad(includeFontPadding)
-                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER);
-                    if (conf.numberOfLines != null) {
-                        builder = builder.setMaxLines(conf.numberOfLines)
-                                .setEllipsize(TextUtils.TruncateAt.END);
-                    }
-                    layout = builder.build();
-                } else {
-                    layout = new StaticLayout(
-                            text,
-                            textPaint,
-                            hintWidth,
-                            Layout.Alignment.ALIGN_NORMAL,
-                            SPACING_MULTIPLIER,
-                            SPACING_ADDITION,
-                            includeFontPadding
-                    );
-                }
+                layout = buildStaticLayout(conf, includeFontPadding, sb, textPaint, hintWidth);
             }
 
             final int lineCount = layout.getLineCount();
@@ -231,31 +210,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
 
                 // Reset the SB text, the attrs will expand to its full length
                 sb.replace(0, sb.length(), text);
-
-                if (Build.VERSION.SDK_INT >= 23) {
-                    StaticLayout.Builder builder = StaticLayout.Builder.obtain(sb, 0, sb.length(), textPaint, (int) width)
-                            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-                            .setBreakStrategy(textBreakStrategy)
-                            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
-                            .setIncludePad(includeFontPadding)
-                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER);
-                    if (conf.numberOfLines != null) {
-                        builder = builder.setMaxLines(conf.numberOfLines)
-                                .setEllipsize(TextUtils.TruncateAt.END);
-                    }
-                    layout = builder.build();
-                } else {
-                    layout = new StaticLayout(
-                            sb,
-                            textPaint,
-                            (int) width,
-                            Layout.Alignment.ALIGN_NORMAL,
-                            SPACING_MULTIPLIER,
-                            SPACING_ADDITION,
-                            includeFontPadding
-                    );
-                }
-
+                layout = buildStaticLayout(conf, includeFontPadding, sb, textPaint, (int) width);
                 result.pushDouble(layout.getHeight() / density);
             }
 
@@ -498,5 +453,36 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
                 break;
             }
         }
+    }
+
+    /** Builds the staticLayout from the configuration */
+    private Layout buildStaticLayout(
+            RNTextSizeConf conf, boolean includeFontPadding, SpannableStringBuilder sb,
+            TextPaint textPaint, int hintWidth) {
+        Layout layout;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(sb, 0, sb.length(), textPaint, hintWidth)
+                    .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                    .setBreakStrategy(conf.getTextBreakStrategy())
+                    .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
+                    .setIncludePad(includeFontPadding)
+                    .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER);
+            if (conf.numberOfLines != null) {
+                builder = builder.setMaxLines(conf.numberOfLines)
+                        .setEllipsize(TextUtils.TruncateAt.END);
+            }
+            layout = builder.build();
+        } else {
+            layout = new StaticLayout(
+                    sb,
+                    textPaint,
+                    hintWidth,
+                    Layout.Alignment.ALIGN_NORMAL,
+                    SPACING_MULTIPLIER,
+                    SPACING_ADDITION,
+                    includeFontPadding
+            );
+        }
+        return layout;
     }
 }

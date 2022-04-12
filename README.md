@@ -100,6 +100,7 @@ fontStyle          | string  | 'normal' | One of "normal" or "italic".
 lineHeight         | number  | (none)   | The line height of each line. Defaults to the font size.
 numberOfLines      | number  | (none)   | Limit the number of lines the text can render on
 fontVariant        | array   | (none)   | _iOS only_
+ceilToClosestPixel | boolean | true     | _iOS only_. If true, we ceil the output to the closest pixel. This is React Native's default behavior, but can be disabled if you're trying to measure text in a native component that doesn't respect this.
 allowFontScaling   | boolean | true     | To respect the user' setting of large fonts (i.e. use SP units).
 letterSpacing      | number  | (none)   | Additional spacing between characters (aka `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+_
 includeFontPadding | boolean | true     | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_

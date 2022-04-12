@@ -70,6 +70,14 @@ declare module "react-native-text-size" {
      * prop on `<Text>`
      */
     numberOfLines?: number;
+    /**
+     * @platform ios
+     *
+     * If true, we ceil the output to the closest pixel. This is React Native's
+     * default behavior, but can be disabled if you're trying to measure text in
+     * a native component that doesn't respect this.
+     */
+    ceilToClosestPixel?: boolean;
     /** @platform ios */
     fontVariant?: Array<TSFontVariant>;
     /** iOS all, Android SDK 21+ with RN 0.55+ */

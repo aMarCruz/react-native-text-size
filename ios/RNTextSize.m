@@ -109,9 +109,8 @@ RCT_EXPORT_METHOD(measure:(NSDictionary * _Nullable)options
     size.width -= letterSpacing;
   }
 
-  const CGFloat epsilon = 0.001;
-  const CGFloat width = MIN(RCTCeilPixelValue(size.width + epsilon), maxSize.width);
-  const CGFloat height = MIN(RCTCeilPixelValue(size.height + epsilon), maxSize.height);
+  const CGFloat width = [self adjustMeasuredSize:size.width withOptions:options withMaxSize:maxSize.width];
+  const CGFloat height = [self adjustMeasuredSize:size.height withOptions:options withMaxSize:maxSize.height];
   const NSInteger lineCount = [self getLineCount:layoutManager];
 
   NSMutableDictionary *result = [[NSMutableDictionary alloc]
@@ -179,9 +178,6 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
 
   NSMutableArray<NSNumber *> *result = [[NSMutableArray alloc] initWithCapacity:texts.count];
 
-  // When there's no font scaling, adding epsilon offsets the calculation
-  // by a bit, and when there is, it's required. This was tested empirically.
-  const CGFloat epsilon = [self fontScaleMultiplier] != 1.0 ? 0.001 : 0;
 
   for (int ix = 0; ix < texts.count; ix++) {
     NSString *text = texts[ix];
@@ -203,7 +199,9 @@ RCT_EXPORT_METHOD(flatHeights:(NSDictionary * _Nullable)options
     [textStorage replaceCharactersInRange:range withString:text];
     CGSize size = [layoutManager usedRectForTextContainer:textContainer].size;
 
-    const CGFloat height = MIN(RCTCeilPixelValue(size.height + epsilon), maxSize.height);
+    const CGFloat height = [self adjustMeasuredSize:size.height
+                                        withOptions:options
+                                        withMaxSize:maxSize.height];
     result[ix] = @(height);
   }
 
@@ -606,8 +604,8 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * parameters and the options the user passes in.
  */
 - (NSDictionary<NSAttributedStringKey,id> *const)textStorageAttributesFromOptions:(NSDictionary * _Nullable)options
-                                                              withFont:(UIFont *const _Nullable)font
-                                                     withLetterSpacing:(CGFloat)letterSpacing
+                                                                         withFont:(UIFont *const _Nullable)font
+                                                                withLetterSpacing:(CGFloat)letterSpacing
 {
   NSMutableDictionary<NSAttributedStringKey,id> *const attributes = [[NSMutableDictionary alloc] init];
   [attributes setObject:font forKey:NSFontAttributeName];
@@ -630,6 +628,30 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 
 - (CGFloat)fontScaleMultiplier {
   return _bridge ? _bridge.accessibilityManager.multiplier : 1.0;
+}
+
+/**
+ * React Native ceils sizes to the nearest pixels by default, so we usually
+ * want to adjust it to that
+ */
+- (CGFloat)adjustMeasuredSize:(const CGFloat)size
+                  withOptions:(NSDictionary *)options
+                  withMaxSize:(const CGFloat)maxSize
+{
+  CGFloat adjusted = size;
+
+  NSString *const key = @"ceilToClosestPixel";
+  BOOL ceilToClosestPixel = ![options objectForKey:key] || [options[key] boolValue];
+
+  if (ceilToClosestPixel) {
+    // When there's no font scaling, adding epsilon offsets the calculation
+    // by a bit, and when there is, it's required. This was tested empirically.
+    const CGFloat epsilon = [self fontScaleMultiplier] != 1.0 ? 0.001 : 0;
+    adjusted = RCTCeilPixelValue(size + epsilon);
+  }
+  adjusted = MIN(adjusted, maxSize);
+
+  return size;
 }
 
 @end
