@@ -573,7 +573,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
   return count ? [NSArray arrayWithObjects:outArr count:count] : nil;
 }
 
-- (CGSize)maxSizeFromOptions:(NSDictionary * _Nullable)options
+- (CGSize)maxSizeFromOptions:(const NSDictionary *)options
 {
   const CGFloat optWidth = CGFloatValueFrom(options[@"width"]);
   const CGFloat maxWidth = isnan(optWidth) || isinf(optWidth) ? CGFLOAT_MAX : optWidth;
@@ -584,7 +584,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
 /**
  * Creates a textContainer with the width and numberOfLines from options.
  */
-- (NSTextContainer *)textContainerFromOptions:(NSDictionary * _Nullable)options
+- (NSTextContainer *)textContainerFromOptions:(const NSDictionary *)options
                                   withMaxSize:(CGSize)maxSize
 {
   NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:maxSize];
@@ -603,7 +603,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * Creates attributes that should be passed into the TextStorage based on
  * parameters and the options the user passes in.
  */
-- (NSDictionary<NSAttributedStringKey,id> *const)textStorageAttributesFromOptions:(NSDictionary * _Nullable)options
+- (NSDictionary<NSAttributedStringKey,id> *const)textStorageAttributesFromOptions:(const NSDictionary *)options
                                                                          withFont:(UIFont *const _Nullable)font
                                                                 withLetterSpacing:(CGFloat)letterSpacing
 {
@@ -634,9 +634,9 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
  * React Native ceils sizes to the nearest pixels by default, so we usually
  * want to adjust it to that
  */
-- (CGFloat)adjustMeasuredSize:(const CGFloat)size
-                  withOptions:(NSDictionary *)options
-                  withMaxSize:(const CGFloat)maxSize
+- (CGFloat)adjustMeasuredSize:(CGFloat)size
+                  withOptions:(const NSDictionary *)options
+                  withMaxSize:(CGFloat)maxSize
 {
   CGFloat adjusted = size;
 
