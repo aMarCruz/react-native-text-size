@@ -651,7 +651,7 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
   }
   adjusted = MIN(adjusted, maxSize);
 
-  return size;
+  return adjusted;
 }
 
 @end
