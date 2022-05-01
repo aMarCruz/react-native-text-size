@@ -163,61 +163,26 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
         }
     }
 
-    // https://stackoverflow.com/questions/3654321/measuring-text-height-to-be-drawn-on-canvas-android
+    /**
+     * Retrieves sizes of each entry in an array of strings rendered with the same style.
+     *
+     * https://stackoverflow.com/questions/3654321/measuring-text-height-to-be-drawn-on-canvas-android
+     */
+    @SuppressWarnings("unused")
+    @ReactMethod
+    public void flatSizes(@Nullable final ReadableMap specs, final Promise promise) {
+        flatHeightsInner(specs, promise, true);
+    }
+
+    /**
+     * Retrieves heights of each entry in an array of strings rendered with the same style.
+     *
+     * https://stackoverflow.com/questions/3654321/measuring-text-height-to-be-drawn-on-canvas-android
+     */
     @SuppressWarnings("unused")
     @ReactMethod
     public void flatHeights(@Nullable final ReadableMap specs, final Promise promise) {
-        final RNTextSizeConf conf = getConf(specs, promise, true);
-        if (conf == null) {
-            return;
-        }
-
-        final ReadableArray texts = conf.getArray("text");
-        if (texts == null) {
-            promise.reject(E_MISSING_TEXT, "Missing required text, must be an array.");
-            return;
-        }
-
-        final float density = getCurrentDensity();
-        final float width = conf.getWidth(density);
-        final boolean includeFontPadding = conf.includeFontPadding;
-        final int textBreakStrategy = conf.getTextBreakStrategy();
-
-        final WritableArray result = Arguments.createArray();
-
-        final SpannableStringBuilder sb = new SpannableStringBuilder(" ");
-        RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
-
-        final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        Layout layout;
-        try {
-
-            for (int ix = 0; ix < texts.size(); ix++) {
-
-                // If this element is `null` or another type, return zero
-                if (texts.getType(ix) != ReadableType.String) {
-                    result.pushInt(0);
-                    continue;
-                }
-
-                final String text = texts.getString(ix);
-
-                // If empty, return the minimum height of <Text> components
-                if (text.isEmpty()) {
-                    result.pushDouble(minimalHeight(density, includeFontPadding));
-                    continue;
-                }
-
-                // Reset the SB text, the attrs will expand to its full length
-                sb.replace(0, sb.length(), text);
-                layout = buildStaticLayout(conf, includeFontPadding, sb, textPaint, (int) width);
-                result.pushDouble(layout.getHeight() / density);
-            }
-
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(E_UNKNOWN_ERROR, e);
-        }
+        flatHeightsInner(specs, promise, false);
     }
 
     /**
@@ -312,6 +277,77 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
     //      Non-exposed instance & static methods
     //
     // ============================================================================
+
+    private void flatHeightsInner(@Nullable final ReadableMap specs, final Promise promise, boolean includeWidths) {
+        final RNTextSizeConf conf = getConf(specs, promise, true);
+        if (conf == null) {
+            return;
+        }
+
+        final ReadableArray texts = conf.getArray("text");
+        if (texts == null) {
+            promise.reject(E_MISSING_TEXT, "Missing required text, must be an array.");
+            return;
+        }
+
+        final float density = getCurrentDensity();
+        final float width = conf.getWidth(density);
+        final boolean includeFontPadding = conf.includeFontPadding;
+        final int textBreakStrategy = conf.getTextBreakStrategy();
+
+        final WritableArray heights = Arguments.createArray();
+        final WritableArray widths = Arguments.createArray();
+
+        final SpannableStringBuilder sb = new SpannableStringBuilder(" ");
+        RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
+
+        final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+        Layout layout;
+        try {
+
+            for (int ix = 0; ix < texts.size(); ix++) {
+
+                // If this element is `null` or another type, return zero
+                if (texts.getType(ix) != ReadableType.String) {
+                    heights.pushInt(0);
+                    continue;
+                }
+
+                final String text = texts.getString(ix);
+
+                // If empty, return the minimum height of <Text> components
+                if (text.isEmpty()) {
+                    heights.pushDouble(minimalHeight(density, includeFontPadding));
+                    continue;
+                }
+
+                // Reset the SB text, the attrs will expand to its full length
+                sb.replace(0, sb.length(), text);
+                layout = buildStaticLayout(conf, includeFontPadding, sb, textPaint, (int) width);
+                heights.pushDouble(layout.getHeight() / density);
+
+                if (includeWidths) {
+                    final int lineCount = layout.getLineCount();
+                    float measuredWidth = 0;
+                    for (int i = 0; i < lineCount; i++) {
+                        measuredWidth = Math.max(measuredWidth, layout.getLineMax(i));
+                    }
+                    widths.pushDouble(measuredWidth / density);
+                }
+            }
+
+            if (includeWidths) {
+                final WritableMap output = Arguments.createMap();
+                output.putArray("widths", widths);
+                output.putArray("heights", heights);
+                promise.resolve(output);
+            } else {
+                promise.resolve(heights);
+            }
+        } catch (Exception e) {
+            promise.reject(E_UNKNOWN_ERROR, e);
+        }
+    }
 
     @Nullable
     private RNTextSizeConf getConf(final ReadableMap specs, final Promise promise, boolean forText) {
