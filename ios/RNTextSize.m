@@ -361,19 +361,20 @@ RCT_EXPORT_METHOD(fontNamesForFamilyName:(NSString * _Nullable)fontFamily
   NSMutableArray<NSNumber *> *widths = [[NSMutableArray alloc] initWithCapacity:texts.count];
   NSMutableArray<NSNumber *> *heights = [[NSMutableArray alloc] initWithCapacity:texts.count];
 
-
   for (int ix = 0; ix < texts.count; ix++) {
     NSString *text = texts[ix];
 
     // If this element is `null` or another type, return zero
     if (![text isKindOfClass:[NSString class]]) {
       heights[ix] = @0;
+      widths[ix] = @0;
       continue;
     }
 
     // If empty, return the minimum height of <Text> components
     if (!text.length) {
       heights[ix] = @14;
+      widths[ix] = @0;
       continue;
     }
 
