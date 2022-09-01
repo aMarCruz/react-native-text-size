@@ -27,6 +27,8 @@ In both functions, the text to be measured is required, but the rest of the para
 - `fontSize`
 - `fontWeight`
 - `fontStyle`
+- `lineHeight`
+- `numberOfLines`
 - `fontVariant` (iOS)
 - `includeFontPadding` (Android)
 - `textBreakStrategy` (Android)
@@ -62,7 +64,7 @@ See [Manual Installation][2] on the Wiki as an alternative if you have problems 
 
 - [`measure`](#measure)
 
-- [`flatHeights`](#flatheights)
+- [`flatHeights` and `flatSizes`](#flatheights)
 
 - [`specsForTextStyles`](#specsfortextstyles)
 
@@ -99,7 +101,10 @@ fontFamily         | string  | OS dependent | The default is the same applied by
 fontWeight         | string  | 'normal' | On android, numeric ranges has no granularity and '500' to '900' becomes 'bold', but you can use a `fontFamily` of specific weight ("sans-serif-thin", "sans-serif-medium", etc).
 fontSize           | number  | 14       | The default font size comes from RN.
 fontStyle          | string  | 'normal' | One of "normal" or "italic".
+lineHeight         | number  | (none)   | The line height of each line. Defaults to the font size.
+numberOfLines      | number  | (none)   | Limit the number of lines the text can render on
 fontVariant        | array   | (none)   | _iOS only_
+ceilToClosestPixel | boolean | true     | _iOS only_. If true, we ceil the output to the closest pixel. This is React Native's default behavior, but can be disabled if you're trying to measure text in a native component that doesn't respect this.
 allowFontScaling   | boolean | true     | To respect the user' setting of large fonts (i.e. use SP units).
 letterSpacing      | number  | (none)   | Additional spacing between characters (aka `tracking`).<br>**Note:** In iOS a zero cancels automatic kerning.<br>_All iOS, Android with API 21+_
 includeFontPadding | boolean | true     | Include additional top and bottom padding, to avoid clipping certain characters.<br>_Android only_
@@ -198,9 +203,10 @@ class Test extends Component<Props, State> {
 
 ```ts
 flatHeights(options: TSHeightsParams): Promise<number[]>
+flatSizes(options: TSHeightsParams): Promise<TSFlatSizes>
 ```
 
-Calculate the height of each of the strings in an array.
+Calculate the height (or sizes) of each of the strings in an array.
 
 This is an alternative to `measure` designed for cases in which you have to calculate the height of numerous text blocks with common characteristics (width, font, etc), a typical use case with `<FlatList>` or `<RecyclerListView>` components.
 
@@ -212,6 +218,8 @@ I did tests on 5,000 random text blocks and these were the results (ms):
 ------- | --------: | ----------:
 Android | 49,624    | 1,091
 iOS     |  1,949    |   732
+
+Note that `flatSizes` is somewhat slower than `flatHeights` on Android since it needs to iterate through lines to find the maximum line length.
 
 In the future I will prepare an example of its use with FlatList and multiple styles on the same card.
 
@@ -232,6 +240,7 @@ allowFontScaling    | boolean  | true
 letterSpacing       | number   | (none)
 includeFontPadding  | boolean  | true
 textBreakStrategy   | string   | 'highQuality'
+numberOfLines       | number   | (none)
 
 The result is a Promise that resolves to an array with the height of each block (in _SP_), in the same order in which the blocks were received.
 

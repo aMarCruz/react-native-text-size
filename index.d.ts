@@ -5,7 +5,7 @@ declare module "react-native-text-size" {
   export type TSFontVariant = 'small-caps' | 'oldstyle-nums' | 'lining-nums' | 'tabular-nums' | 'proportional-nums'
   export type TSTextBreakStrategy = 'simple' | 'highQuality' | 'balanced'
 
-  export type TSFontSize = {
+  export interface TSFontSize {
     readonly default: number,
     readonly button: number,
     readonly label: number,
@@ -41,7 +41,7 @@ declare module "react-native-text-size" {
   | 'title2'
   | 'title3'
 
-  export type TSFontInfo = {
+  export interface TSFontInfo {
     fontFamily: string | null,
     fontName?: string | null,
     fontWeight: TSFontWeight,
@@ -64,6 +64,20 @@ declare module "react-native-text-size" {
     fontSize?: number;
     fontStyle?: TSFontStyle;
     fontWeight?: TSFontWeight;
+    lineHeight?: number;
+    /**
+     * Number of lines to limit the text to. Corresponds to the `numberOfLines`
+     * prop on `<Text>`
+     */
+    numberOfLines?: number;
+    /**
+     * @platform ios
+     *
+     * If true, we ceil the output to the closest pixel. This is React Native's
+     * default behavior, but can be disabled if you're trying to measure text in
+     * a native component that doesn't respect this.
+     */
+    ceilToClosestPixel?: boolean;
     /** @platform ios */
     fontVariant?: Array<TSFontVariant>;
     /** iOS all, Android SDK 21+ with RN 0.55+ */
@@ -74,7 +88,7 @@ declare module "react-native-text-size" {
     textBreakStrategy?: TSTextBreakStrategy;
   }
 
-  export type TSFontForStyle = {
+  export interface TSFontForStyle {
     fontFamily: string,
     /** Unscaled font size, untits are SP in Android, points in iOS */
     fontSize: number,
@@ -129,7 +143,7 @@ declare module "react-native-text-size" {
     lineInfoForLine?: number;
   }
 
-  export type TSMeasureResult = {
+  export interface TSMeasureResult {
     /**
      * Total used width. It may be less or equal to the `width` option.
      *
@@ -171,8 +185,14 @@ declare module "react-native-text-size" {
     };
   }
 
+  export interface TSFlatSizes {
+    widths: number[];
+    heights: number[];
+  }
+
   interface TextSizeStatic {
     measure(params: TSMeasureParams): Promise<TSMeasureResult>;
+    flatSizes(params: TSHeightsParams): Promise<TSFlatSizes>;
     flatHeights(params: TSHeightsParams): Promise<number[]>;
     specsForTextStyles(): Promise<{ [key: string]: TSFontForStyle }>;
     fontFromSpecs(specs?: TSFontSpecs): Promise<TSFontInfo>;

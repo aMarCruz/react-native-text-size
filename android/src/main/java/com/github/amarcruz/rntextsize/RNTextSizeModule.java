@@ -10,6 +10,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -88,25 +89,26 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        final SpannableString text = (SpannableString) RNTextSizeSpannedText
-                .spannedFromSpecsAndText(mReactContext, conf, new SpannableString(_text));
+        final SpannableStringBuilder sb = new SpannableStringBuilder(_text);
+        RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
+
 
         final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
         Layout layout = null;
         try {
-            final BoringLayout.Metrics boring = BoringLayout.isBoring(text, textPaint);
+            final BoringLayout.Metrics boring = BoringLayout.isBoring(sb, textPaint);
             int hintWidth = (int) width;
 
             if (boring == null) {
                 // Not boring, ie. the text is multiline or contains unicode characters.
-                final float desiredWidth = Layout.getDesiredWidth(text, textPaint);
+                final float desiredWidth = Layout.getDesiredWidth(sb, textPaint);
                 if (desiredWidth <= width) {
                     hintWidth = (int) Math.ceil(desiredWidth);
                 }
             } else if (boring.width <= width) {
                 // Single-line and width unknown or bigger than the width of the text.
                 layout = BoringLayout.make(
-                        text,
+                        sb,
                         textPaint,
                         boring.width,
                         Layout.Alignment.ALIGN_NORMAL,
@@ -117,25 +119,7 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             }
 
             if (layout == null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    layout = StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, hintWidth)
-                            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-                            .setBreakStrategy(conf.getTextBreakStrategy())
-                            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
-                            .setIncludePad(includeFontPadding)
-                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
-                            .build();
-                } else {
-                    layout = new StaticLayout(
-                            text,
-                            textPaint,
-                            hintWidth,
-                            Layout.Alignment.ALIGN_NORMAL,
-                            SPACING_MULTIPLIER,
-                            SPACING_ADDITION,
-                            includeFontPadding
-                    );
-                }
+                layout = buildStaticLayout(conf, includeFontPadding, sb, textPaint, hintWidth);
             }
 
             final int lineCount = layout.getLineCount();
@@ -179,81 +163,26 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
         }
     }
 
-    // https://stackoverflow.com/questions/3654321/measuring-text-height-to-be-drawn-on-canvas-android
+    /**
+     * Retrieves sizes of each entry in an array of strings rendered with the same style.
+     *
+     * https://stackoverflow.com/questions/3654321/measuring-text-height-to-be-drawn-on-canvas-android
+     */
+    @SuppressWarnings("unused")
+    @ReactMethod
+    public void flatSizes(@Nullable final ReadableMap specs, final Promise promise) {
+        flatHeightsInner(specs, promise, true);
+    }
+
+    /**
+     * Retrieves heights of each entry in an array of strings rendered with the same style.
+     *
+     * https://stackoverflow.com/questions/3654321/measuring-text-height-to-be-drawn-on-canvas-android
+     */
     @SuppressWarnings("unused")
     @ReactMethod
     public void flatHeights(@Nullable final ReadableMap specs, final Promise promise) {
-        final RNTextSizeConf conf = getConf(specs, promise, true);
-        if (conf == null) {
-            return;
-        }
-
-        final ReadableArray texts = conf.getArray("text");
-        if (texts == null) {
-            promise.reject(E_MISSING_TEXT, "Missing required text, must be an array.");
-            return;
-        }
-
-        final float density = getCurrentDensity();
-        final float width = conf.getWidth(density);
-        final boolean includeFontPadding = conf.includeFontPadding;
-        final int textBreakStrategy = conf.getTextBreakStrategy();
-
-        final WritableArray result = Arguments.createArray();
-
-        final SpannableStringBuilder sb = new SpannableStringBuilder(" ");
-        RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
-
-        final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
-        Layout layout;
-        try {
-
-            for (int ix = 0; ix < texts.size(); ix++) {
-
-                // If this element is `null` or another type, return zero
-                if (texts.getType(ix) != ReadableType.String) {
-                    result.pushInt(0);
-                    continue;
-                }
-
-                final String text = texts.getString(ix);
-
-                // If empty, return the minimum height of <Text> components
-                if (text.isEmpty()) {
-                    result.pushDouble(minimalHeight(density, includeFontPadding));
-                    continue;
-                }
-
-                // Reset the SB text, the attrs will expand to its full length
-                sb.replace(0, sb.length(), text);
-
-                if (Build.VERSION.SDK_INT >= 23) {
-                    layout = StaticLayout.Builder.obtain(sb, 0, sb.length(), textPaint, (int) width)
-                            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-                            .setBreakStrategy(textBreakStrategy)
-                            .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
-                            .setIncludePad(includeFontPadding)
-                            .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
-                            .build();
-                } else {
-                    layout = new StaticLayout(
-                            sb,
-                            textPaint,
-                            (int) width,
-                            Layout.Alignment.ALIGN_NORMAL,
-                            SPACING_MULTIPLIER,
-                            SPACING_ADDITION,
-                            includeFontPadding
-                    );
-                }
-
-                result.pushDouble(layout.getHeight() / density);
-            }
-
-            promise.resolve(result);
-        } catch (Exception e) {
-            promise.reject(E_UNKNOWN_ERROR, e);
-        }
+        flatHeightsInner(specs, promise, false);
     }
 
     /**
@@ -348,6 +277,77 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
     //      Non-exposed instance & static methods
     //
     // ============================================================================
+
+    private void flatHeightsInner(@Nullable final ReadableMap specs, final Promise promise, boolean includeWidths) {
+        final RNTextSizeConf conf = getConf(specs, promise, true);
+        if (conf == null) {
+            return;
+        }
+
+        final ReadableArray texts = conf.getArray("text");
+        if (texts == null) {
+            promise.reject(E_MISSING_TEXT, "Missing required text, must be an array.");
+            return;
+        }
+
+        final float density = getCurrentDensity();
+        final float width = conf.getWidth(density);
+        final boolean includeFontPadding = conf.includeFontPadding;
+        final int textBreakStrategy = conf.getTextBreakStrategy();
+
+        final WritableArray heights = Arguments.createArray();
+        final WritableArray widths = Arguments.createArray();
+
+        final SpannableStringBuilder sb = new SpannableStringBuilder(" ");
+        RNTextSizeSpannedText.spannedFromSpecsAndText(mReactContext, conf, sb);
+
+        final TextPaint textPaint = new TextPaint(TextPaint.ANTI_ALIAS_FLAG);
+        Layout layout;
+        try {
+
+            for (int ix = 0; ix < texts.size(); ix++) {
+
+                // If this element is `null` or another type, return zero
+                if (texts.getType(ix) != ReadableType.String) {
+                    heights.pushInt(0);
+                    continue;
+                }
+
+                final String text = texts.getString(ix);
+
+                // If empty, return the minimum height of <Text> components
+                if (text.isEmpty()) {
+                    heights.pushDouble(minimalHeight(density, includeFontPadding));
+                    continue;
+                }
+
+                // Reset the SB text, the attrs will expand to its full length
+                sb.replace(0, sb.length(), text);
+                layout = buildStaticLayout(conf, includeFontPadding, sb, textPaint, (int) width);
+                heights.pushDouble(layout.getHeight() / density);
+
+                if (includeWidths) {
+                    final int lineCount = layout.getLineCount();
+                    float measuredWidth = 0;
+                    for (int i = 0; i < lineCount; i++) {
+                        measuredWidth = Math.max(measuredWidth, layout.getLineMax(i));
+                    }
+                    widths.pushDouble(measuredWidth / density);
+                }
+            }
+
+            if (includeWidths) {
+                final WritableMap output = Arguments.createMap();
+                output.putArray("widths", widths);
+                output.putArray("heights", heights);
+                promise.resolve(output);
+            } else {
+                promise.resolve(heights);
+            }
+        } catch (Exception e) {
+            promise.reject(E_UNKNOWN_ERROR, e);
+        }
+    }
 
     @Nullable
     private RNTextSizeConf getConf(final ReadableMap specs, final Promise promise, boolean forText) {
@@ -489,5 +489,36 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
                 break;
             }
         }
+    }
+
+    /** Builds the staticLayout from the configuration */
+    private Layout buildStaticLayout(
+            RNTextSizeConf conf, boolean includeFontPadding, SpannableStringBuilder sb,
+            TextPaint textPaint, int hintWidth) {
+        Layout layout;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            StaticLayout.Builder builder = StaticLayout.Builder.obtain(sb, 0, sb.length(), textPaint, hintWidth)
+                    .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                    .setBreakStrategy(conf.getTextBreakStrategy())
+                    .setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NORMAL)
+                    .setIncludePad(includeFontPadding)
+                    .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER);
+            if (conf.numberOfLines != null) {
+                builder = builder.setMaxLines(conf.numberOfLines)
+                        .setEllipsize(TextUtils.TruncateAt.END);
+            }
+            layout = builder.build();
+        } else {
+            layout = new StaticLayout(
+                    sb,
+                    textPaint,
+                    hintWidth,
+                    Layout.Alignment.ALIGN_NORMAL,
+                    SPACING_MULTIPLIER,
+                    SPACING_ADDITION,
+                    includeFontPadding
+            );
+        }
+        return layout;
     }
 }

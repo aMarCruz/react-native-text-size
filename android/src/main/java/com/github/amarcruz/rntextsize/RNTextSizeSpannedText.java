@@ -9,6 +9,8 @@ import android.text.style.AbsoluteSizeSpan;
 import android.text.style.MetricAffectingSpan;
 
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.views.text.CustomLineHeightSpan;
+import com.facebook.react.views.text.TextAttributes;
 
 import javax.annotation.Nonnull;
 
@@ -47,6 +49,13 @@ final class RNTextSizeSpannedText {
             priority++;
             setSpanOperation(text, end, priority,
                     new CustomStyleSpan(RNTextSizeConf.getFont(context, conf.fontFamily, conf.fontStyle)));
+        }
+
+        if (!Float.isNaN(conf.lineHeight)) {
+            priority++;
+            final TextAttributes textAttributes = new TextAttributes();
+            textAttributes.setLineHeight(conf.lineHeight);
+            setSpanOperation(text, end, priority, new CustomLineHeightSpan(textAttributes.getEffectiveLineHeight()));
         }
 
         return text;
