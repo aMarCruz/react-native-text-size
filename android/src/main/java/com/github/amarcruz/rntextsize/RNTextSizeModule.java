@@ -162,8 +162,8 @@ class RNTextSizeModule extends ReactContextBaseJavaModule {
             result.putInt("lineCount", lineCount);
 
             Integer lineInfoForLine = conf.getIntOrNull("lineInfoForLine");
-            if (lineInfoForLine != null && lineInfoForLine >= 0) {
-                final int line = Math.min(lineInfoForLine, lineCount);
+            if (lineInfoForLine != null && lineInfoForLine >= 0 && lineCount > 0) {
+                final int line = Math.min(lineInfoForLine, lineCount - 1);
                 final WritableMap info = Arguments.createMap();
                 info.putInt("line", line);
                 info.putInt("start", layout.getLineStart(line));
