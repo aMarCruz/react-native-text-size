@@ -16,7 +16,6 @@ def _minSdkVersion      = safeExtGet('minSdkVersion', 16)
 buildscript {
     repositories {
         google()
-        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.4.1'
@@ -43,7 +42,6 @@ android {
 repositories {
     mavenLocal()
     google()
-    jcenter()
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
         url "$rootDir/../node_modules/react-native/android"
@@ -51,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.facebook.react:react-native:+'
+    implementation 'com.facebook.react:react-native:+'
 }
 
 task customClean(type: Delete) {
