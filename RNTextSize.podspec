@@ -2,7 +2,7 @@ require 'json'
 package = JSON.parse(File.read('./package.json'))
 
 Pod::Spec.new do |s|
-  s.name         = 'react-native-text-size'
+  s.name         = 'RNTextSize'
   s.version      = package['version']
   s.summary      = package['description']
   s.description  = <<-DESC
@@ -12,9 +12,9 @@ Pod::Spec.new do |s|
   s.homepage     = package['homepage']
   s.license      = package['license']
   s.author       = package['author']
-  s.platform     = { :ios => "9.0" }
+  s.platform     = :ios, '9.0'
   s.source       = { :git => package['repository'], :tag => "v#{s.version}" }
-  s.source_files = 'ios/**/*.{h,m,mm,swift}'
+  s.source_files = 'ios/*.{h,m}'
   s.requires_arc = true
 
   s.dependency 'React'
