@@ -8,18 +8,22 @@ def safeExtGet(prop, fallback) {
     return rootProject.ext.hasProperty(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-def _buildToolsVersion  = safeExtGet('buildToolsVersion', '28.0.3')
-def _compileSdkVersion  = safeExtGet('compileSdkVersion', 28)
-def _targetSdkVersion   = safeExtGet('targetSdkVersion', 28)
+def _compileSdkVersion  = safeExtGet('compileSdkVersion', 30)
+def _targetSdkVersion   = safeExtGet('targetSdkVersion', 30)
 def _minSdkVersion      = safeExtGet('minSdkVersion', 16)
 
 buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+    // module dependency in an application project.
+    if (project == rootProject) {
+        repositories {
+            google()
+        }
+
+        dependencies {
+            classpath("com.android.tools.build:gradle:8.0.1")
+        }
     }
 }
 
@@ -27,7 +31,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion _compileSdkVersion
-    buildToolsVersion _buildToolsVersion
 
     defaultConfig {
         minSdkVersion _minSdkVersion
@@ -43,7 +46,6 @@ android {
 repositories {
     mavenLocal()
     google()
-    jcenter()
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
         url "$rootDir/../node_modules/react-native/android"
@@ -51,7 +53,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.facebook.react:react-native:+'
+    implementation 'com.facebook.react:react-native:+'
 }
 
 task customClean(type: Delete) {
