@@ -1,13 +1,13 @@
-# React Native Text Size
+# React Native Text Size Latest
 
 [![npm Version][npm-badge]][npm-url]
 [![License][license-badge]][license-url]
 
 Measure text accurately before laying it out and get font information from your App (Android and iOS).
 
-In my country (México), software developers are poorly paid, so I have had to look for another job to earn a living and I cannot dedicate more time to maintaining this and other repositories that over the years have never generated any money for me. If anyone is interested in maintaining this repository, I'd be happy to transfer it to them, along with the associated npm package. |
-:---: |
-En mi país (México), los desarrolladores de software somos pésimamente pagados, por lo que he tenido que buscar otro trabajo para ganarme la vida y no puedo dedicar más tiempo a mantener éste y otros repositorios que a través de los años nunca me generaron dinero. Si a alguien le interesa dar mantenimiento a este repositorio, con gusto se lo transferiré, así como el paquete de npm asociado. |
+# react-native-text-size-latest: 
+An enhanced and updated version of the original 'react-native-text-size' package, tailored for compatibility with the latest React Native version 0.73. I've taken on the responsibility of maintaining and improving this repository going forward. If you find this project valuable and would like to support its ongoing development, you can buy me a coffee [here][kofi-url]. Your support is greatly appreciated and encourages the continued enhancement of this repository.
+
 
 There are two main functions: `flatHeights` to obtain the height of different blocks of text simultaneously, optimized for components such as [`<FlatList>`][0] or [`<RecyclerListView>`][1].
 
@@ -36,15 +36,15 @@ In both functions, the text to be measured is required, but the rest of the para
 
 In addition, the library includes functions to obtain information about the fonts visible to the App.
 
-If it has helped you, please support my work with a star ⭐️ or [ko-fi][kofi-url].
+If it has helped you, please support my work with [Buy me a coffee][kofi-url].
 
 ## Installation
 
 Mostly automatic installation from npm
 
 ```bash
-yarn add react-native-text-size
-react-native link react-native-text-size
+yarn add react-native-text-size-latest
+react-native link react-native-text-size-latest
 ```
 
 Change the `compile` directive to `implementation` in the dependencies block of the android/app/build.gradle file.
@@ -56,7 +56,7 @@ Change the `compile` directive to `implementation` in the dependencies block of 
 
 For versions prior to 0.56 of React Native, please use [react-native-text-size v2.1.1](https://www.npmjs.com/package/react-native-text-size/v/2.1.1)
 
-See [Manual Installation][2] on the Wiki as an alternative if you have problems with automatic installation.
+See [Manual Installation][2] on the Wiki as an alternative if you have problems with automatic installation. make sure to change the `react-native-text-size` with `react-native-text-size-latest`
 
 ## API
 
@@ -147,7 +147,7 @@ E_UNKNOWN_ERROR      | Well... who knows?
 
 ```jsx
 //...
-import rnTextSize, { TSFontSpecs } from 'react-native-text-size'
+import rnTextSize, { TSFontSpecs } from 'react-native-text-size-latest'
 
 type Props = {}
 type State = { width: number, height: number }
@@ -241,7 +241,7 @@ Unlike measure, `null` elements returns 0 without generating error, and empty st
 
 ```jsx
 //...
-import rnTextSize, { TSFontSpecs } from 'react-native-text-size'
+import rnTextSize, { TSFontSpecs } from 'react-native-text-size-latest'
 
 type Props = { texts: string[] }
 type State = { heights: number[] }
@@ -449,7 +449,7 @@ The [BSD 2-Clause](LICENSE) "Simplified" License.
 [npm-url]:        https://www.npmjs.com/package/react-native-text-size
 [license-badge]:  https://img.shields.io/badge/license-BSD%202--Clause-blue.svg
 [license-url]:    https://github.com/aMarCruz/react-native-text-size/blob/master/LICENSE
-[kofi-url]:       https://ko-fi.com/C0C7LF7I
+[kofi-url]:       https://www.buymeacoffee.com/rsZpewEpSq
 [sample-app]:     https://github.com/aMarCruz/rn-text-size-sample-app
 [0]: https://facebook.github.io/react-native/docs/flatlist
 [1]: https://www.npmjs.com/package/recyclerlistview
