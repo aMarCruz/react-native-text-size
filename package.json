@@ -1,6 +1,6 @@
 {
   "name": "react-native-text-size-latest",
-  "version": "4.0.0-rc.2",
+  "version": "1.6.0-rc.7",
   "description": "Measure text accurately before laying it out and get font information from your App",
   "main": "index.js",
   "keywords": [
@@ -28,5 +28,8 @@
   },
   "peerDependencies": {
     "react-native": ">=0.59.0"
+  },
+  "dependencies": {
+    "react-native-text-size-latest": "file:.yalc/react-native-text-size-latest"
   }
 }
