@@ -8,10 +8,10 @@ def safeExtGet(prop, fallback) {
     return rootProject.ext.hasProperty(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-def _buildToolsVersion  = safeExtGet('buildToolsVersion', '28.0.3')
-def _compileSdkVersion  = safeExtGet('compileSdkVersion', 28)
-def _targetSdkVersion   = safeExtGet('targetSdkVersion', 28)
-def _minSdkVersion      = safeExtGet('minSdkVersion', 16)
+def _buildToolsVersion  = safeExtGet('buildToolsVersion', '34.0.0')
+def _compileSdkVersion  = safeExtGet('compileSdkVersion', 34)
+def _targetSdkVersion   = safeExtGet('targetSdkVersion', 34)
+def _minSdkVersion      = safeExtGet('minSdkVersion', 21)
 
 buildscript {
     repositories {

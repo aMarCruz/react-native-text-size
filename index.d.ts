@@ -1,4 +1,4 @@
-declare module "react-native-text-size" {
+declare module "react-native-text-size-latest" {
 
   export type TSFontWeight = 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
   export type TSFontStyle = 'normal' | 'italic'
