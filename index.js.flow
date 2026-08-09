@@ -64,6 +64,20 @@ export type TSFontSpecs = {
   fontSize?: number,
   fontStyle?: TSFontStyle,
   fontWeight?: TSFontWeight,
+  lineHeight?: number;
+  /**
+   * Number of lines to limit the text to. Corresponds to the `numberOfLines`
+   * prop on `<Text>`
+   */
+  numberOfLines?: number,
+  /**
+   * @platform ios
+   *
+   * If true, we ceil the output to the closest pixel. This is React Native's
+   * default behavior, but can be disabled if you're trying to measure text in
+   * a native component that doesn't respect this.
+   */
+  ceilToClosestPixel?: boolean;
   /** @platform ios */
   fontVariant?: Array<TSFontVariant>,
   /** iOS all, Android SDK 21+ with RN 0.55+ */
@@ -170,8 +184,14 @@ export interface TSMeasureResult {
   }
 }
 
+export interface TSFlatSizes {
+  widths: number[];
+  heights: number[];
+}
+
 declare interface TextSizeStatic {
   measure(params: TSMeasureParams): Promise<TSMeasureResult>;
+  flatSizes(params: TSHeightsParams): Promise<TSFlatSizes>;
   flatHeights(params: TSHeightsParams): Promise<number[]>;
   specsForTextStyles(): Promise<{ [string]: TSFontForStyle }>;
   fontFromSpecs(specs: TSFontSpecs): Promise<TSFontInfo>;

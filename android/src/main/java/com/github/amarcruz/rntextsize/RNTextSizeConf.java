@@ -67,8 +67,10 @@ final class RNTextSizeConf {
     final String fontFamily;
     final float fontSize;
     final int fontStyle;
+    final float lineHeight;
     final boolean includeFontPadding;
     final float letterSpacing;
+    final @Nullable Integer numberOfLines;
 
     /**
      * Proccess the user specs. Set both `allowFontScaling` & `includeFontPadding` to the user
@@ -84,10 +86,15 @@ final class RNTextSizeConf {
         fontFamily = getString("fontFamily");
         fontSize = getFontSizeOrDefault();
         fontStyle = getFontStyle();
+        lineHeight = getFloatOrNaN("lineHeight");
         includeFontPadding = forText && getBooleanOrTrue("includeFontPadding");
 
         // letterSpacing is supported in RN 0.55+
         letterSpacing = supportLetterSpacing() ? getFloatOrNaN("letterSpacing") : Float.NaN;
+
+        Integer rawNumberOfLines = getIntOrNull("numberOfLines");
+        if (rawNumberOfLines != null && rawNumberOfLines < 0) rawNumberOfLines = null;
+        numberOfLines = rawNumberOfLines;
     }
 
     boolean has(@Nonnull final String name) {

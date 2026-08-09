@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ### Added
 
-- Updated README.md with example for flatHeights - Thanks to @donni106
+- Update README.md with example for flatHeights - Thanks to @donni106
+- Create new flatSizes function that also gets the widths
+- Add support for `numberOfLines` and `maxWidth/maxHeight` dimensions.
 
 ### Changed
 
